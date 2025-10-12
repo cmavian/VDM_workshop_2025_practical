@@ -41,8 +41,7 @@ cd metagenomics
 4. let's make other folders 
 
 ```
-mkdir data
-mkdir results
+mkdir data results
 ```
 4. let's go into data and copy our files there
 
