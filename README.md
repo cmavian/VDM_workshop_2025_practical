@@ -54,10 +54,12 @@ cd metagenomics
 
 ```
 mkdir data results scripts
+ls
 ```
 4. let's go into data and copy our files there
 
 ```
+cd data
 cp xxxxxxx/lib* .
 ls
 ```
