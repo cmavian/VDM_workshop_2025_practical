@@ -31,18 +31,20 @@ xxxxxxx
 
 ### Setting up our folder for the analysis
 
+orientate yourself 
 
 ```
+pwd
 ls
 ```
 
-2. let's make a working folder
+Let's make a working folder
  
 ```
 mkdir metagenomics
 ```
 
-3. go in the folder
+Go into the folder
 
 ```
 cd metagenomics
@@ -51,24 +53,26 @@ cd metagenomics
 4. let's make other folders 
 
 ```
-mkdir data results
+mkdir data results scripts
 ```
 4. let's go into data and copy our files there
 
 ```
-cd data
-cp xxxxxxxxxxxxxxx
+cp xxxxxxx/lib* .
+ls
 ```
 
-### 1. FASTP PRE
-
-
-### 2. MULTIQC
-
-
-### 3. TRIMMOMATIC
+### 1. FastP PRE Trimmomatic
 
 ```
+cd metagenomics/scripts
+nano 
+```
+
+### 2. Trimmomatic
+
+```
+cd metagenomics/scripts
 nano 02.trimmomatic.sh
 ```
 inside you will write:
@@ -114,22 +118,22 @@ If you want to save the changes to the existing file, simply press
 After saving, if you wish to exit the editor, press:
 #### Ctrl + X
 
-### 4. FASTP POST
+### 4. FastP POST Trimmomatic
 
 
 ### 5. MEGAHIT
 
 
-### 6. DIAMOND
+### 6. Diamond
 
 
-### 7. TAXONOMY
+### 7. Taxonomy
 
 
-### 8. LINEAGE FILTER
+### 8. Lineage filter
 
 
-### 9. BLASTN
+### 9. BlastN
 
 
-### 10. BLASTX
+### 10. BlastX
