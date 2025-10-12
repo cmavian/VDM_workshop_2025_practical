@@ -6,5 +6,36 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 
 1. [Fastp](https://github.com/OpenGene/fastp)
 2. [Trimmomatic](https://github.com/usadellab/Trimmomatic)
-3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit))
+3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
+
+<figure>
+    <img src="workflow.png" width="230" height="300">
+    <figcaption>Virus discovery pipeline Workflow</figcaption>
+</figure>
+
+
+### 1. Connecting to the server to run the analysis
+
+Using MobaXterm connect to Host: 
+
+### 2. Setting up our folder for the analysis
+
+
+```
+ls
+```
+
+2. let's make a working folder
+ 
+```
+mkdir metagenomics
+```
+
+3. go in the folder and copy the files
+
+```
+cd metagenomics
+```
+
+### 3. 
