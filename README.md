@@ -32,10 +32,23 @@ ls
 mkdir metagenomics
 ```
 
-3. go in the folder and copy the files
+3. go in the folder
 
 ```
 cd metagenomics
+```
+
+4. let's make other folders 
+
+```
+mkdir data
+mkdir results
+```
+4. let's go into data and copy our files there
+
+```
+cd data
+cp xxxxxxxxxxxxxxx
 ```
 
 ### 3. 
