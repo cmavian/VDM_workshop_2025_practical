@@ -121,11 +121,11 @@ After saving, if you wish to exit the editor, press:
 #### Ctrl + X
 
 
-### 3. MultiQC
+### 3. FastP POST Trimmomatic 
 
 
 
-### 4. FastP POST Trimmomatic
+### 4. MultiQC
 
 
 ### 5. MEGAHIT
