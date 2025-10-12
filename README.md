@@ -10,8 +10,8 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
 
 <figure>
-    <img src="workflow.png" width="230" height="300">
-    <figcaption>Virus discovery pipeline Workflow</figcaption>
+    <img src="workflow.png" width="460" height="600">
+    <figcaption>Virus discovery pipeline Workflow by Nokuzotha Nkiwane </figcaption>
 </figure>
 
 
