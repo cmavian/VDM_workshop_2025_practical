@@ -1,7 +1,7 @@
 # VDM_workshop_2025_practical
 Virus discovery pipeline created by Erin Harvey, Carla Mavian, Nokuzotha Nkiwane, Eduan Wilkinson. #added in alphabetical order
 
-### Metagenomic Workflow: 
+### Metagenomic Workflow
 In this tutorial we will learn how to taxonomically classify and visualize our metagenomic reads obtained with Illumina using the following programs:
 
 1. [Fastp](https://github.com/OpenGene/fastp)
