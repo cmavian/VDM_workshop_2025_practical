@@ -15,11 +15,21 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 </figure>
 
 
-### 1. Connecting to the server to run the analysis
+### Connecting to the server to run the analysis
 
 Using MobaXterm connect to Host: 
 
-### 2. Setting up our folder for the analysis
+```
+xxxxx
+```
+
+```
+xxxxxxx
+```
+
+
+
+### Setting up our folder for the analysis
 
 
 ```
@@ -50,4 +60,31 @@ cd data
 cp xxxxxxxxxxxxxxx
 ```
 
-### 3. 
+### 1. FASTP PRE
+
+
+### 2. MULTIQC
+
+
+### 3. TRIMMOMATIC
+
+
+### 4. FASTP POST
+
+
+### 5. MEGAHIT
+
+
+### 6. DIAMOND
+
+
+### 7. TAXONOMY
+
+
+### 8. LINEAGE FILTER
+
+
+### 9. BLASTN
+
+
+### 10. BLASTX
