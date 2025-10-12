@@ -106,13 +106,13 @@ echo "Trim run for $id complete"
 done
 ```
 and save it by "Write Out" in Nano:
-Ctrl + O 
+#### Ctrl + O 
 
 If you want to save the changes to the existing file, simply press 
-Enter
+#### Enter
 
 After saving, if you wish to exit the editor, press:
-Ctrl + X
+#### Ctrl + X
 
 ### 4. FASTP POST
 
