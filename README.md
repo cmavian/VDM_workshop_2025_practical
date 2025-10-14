@@ -64,11 +64,38 @@ cp xxxxxxx/lib* .
 ls
 ```
 
-### 1. FastP PRE Trimmomatic
+### 1. FastQC PRE Trimmomatic
 
 ```
 cd metagenomics/scripts
 nano 
+```
+
+```
+code 03 
+#!/bin/env bash
+
+ON="module miniconda"
+eval $ON
+ON="conda activate fastqc"
+eval $ON
+
+#input and output directories
+input='/analyses/users/nokuzothan/disc_pipe/init_data/'
+output='/analyses/users/nokuzothan/disc_pipe/init_tools/fastqc_pre'
+
+#make output directory if it doesn't exist
+if [[ ! -d "${output}" ]]; then
+    mkdir "${output}"
+fi
+
+#run fastqc
+for file in ${input}/*.fastq;do
+	fastqc ${file} -o ${output} -t 8
+done
+
+echo "Pretrim FastQC complete"
+
 ```
 
 ### 2. Trimmomatic
@@ -121,12 +148,56 @@ After saving, if you wish to exit the editor, press:
 #### Ctrl + X
 
 
-### 3. FastP POST Trimmomatic 
+### 3. FastQC POST Trimmomatic 
+```
+#!/bin/env bash 
 
+#load fastqc module
+ON="module miniconda"
+eval $ON
+ON="conda activate fastqc"
+eval $ON
+
+#input and output directories
+input='/analyses/users/nokuzothan/disc_pipe/init_data/trimmomatic/output'
+output='/analyses/users/nokuzothan/disc_pipe/init_tools/fastqc_post'
+
+#make output directory if it doesn't exist
+if [[ ! -d "${output}" ]]; then
+    mkdir "${output}"
+fi
+
+#run fastqc
+for file in "${input}";do
+    fastqc ${file} -o ${output}
+done
+```
 
 
 ### 4. MultiQC
+```
+#!/bin/env bash 
 
+#load fastqc module
+ON="module miniconda"
+eval $ON
+ON="conda activate fastqc"
+eval $ON
+
+#input and output directories
+input_pre='/analyses/users/nokuzothan/disc_pipe/init_data/fastqc_pre'
+input_post='/analyses/users/nokuzothan/disc_pipe/init_tools/fastqc_post'
+output='/analyses/users/nokuzothan/disc_pipe/init_tools/multiqc'
+
+#make output directory if it doesn't exist
+if [[ ! -d "${output}" ]]; then
+    mkdir "${output}"
+fi
+
+#run multiqc
+multiqc ${input_pre} ${input_post} -o ${output}
+
+```
 
 ### 5. MEGAHIT
 
