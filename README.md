@@ -1,205 +1,254 @@
-# VDM_workshop_2025_practical
-Virus discovery pipeline created by Erin Harvey, Carla Mavian, Nokuzotha Nkiwane, Eduan Wilkinson. #added in alphabetical order
+<p><b><h1>VDM_workshop_2025_practical</h1></b></p>
+<h3>Virus discovery pipeline</h3>
+<i>created by</i> Erin Harvey, Carla Mavian, Nokuzotha Nkiwane, Eduan Wilkinson.
+<i>(in alphabetical order)</i>
 
-### Metagenomic Workflow
+<b><h3>Metagenomic Workflow</h3></b>
 In this tutorial we will learn how to taxonomically classify and visualize our metagenomic reads obtained with Illumina using the following programs:
-
+<list>
 1. [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 2. [Trimmomatic](https://github.com/usadellab/Trimmomatic)
 3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
-
+</list>
 <figure>
     <img src="workflow.png" width="920" height="1200">
-    <figcaption>Virus discovery pipeline Workflow by Nokuzotha Nkiwane </figcaption>
+    <figcaption><b>Figure 1.</b> Virus discovery pipeline Workflow by Nokuzotha Nkiwane </figcaption>
 </figure>
 
+<b><h3>Connecting to the server to run the analysis</h3></b>
+MacBook's and Linux computers come with terminal windows as part of the system.
+They do not require any additional programs to connect to a server.
+On Windows computers, you have to emulate a terminal.
+Multiple free programs provide that function, e.g [MobaXterm](https://mobaxterm.mobatek.net/), [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html), [GitBash](https://git-scm.com/downloads), [Terminus](https://termius.com/) etc.
+Using one of the emulators, open a terminal and connect to host by typing:
 
-### Connecting to the server to run the analysis
+<pre><code>ssh username@ceri.sarmc.ac.za</code></pre>
 
-Using MobaXterm connect to Host: 
+First time connecting you will be ask if you trust the connection. 
+You have to type 'yes' and press enter.
+Then you will be asked to provide password.
+You will be provided one together with your username at the beginning of the workshop.
+<b>Passwords are case sensitive and invisiable when typing !!!</b>
+Therefore, it is advisable to copy & paste the password.
+Successful connection will print the server's logo on your terminal.<br>
+<i>On average on a server you only have 2-5 tries to type the password afterwhich you'll be blocked for at least 30 minutes.
+It is better to close the terminal and open it again and try again after the second failed password try.</i><br>
 
-```
-xxxxx
-```
+<b><h3>Setting up our folder for the analysis</h3></b>
+<ol start=1>
+<li>Commands used for orentation on the server</li>
+<pre><code></code>pwd</code></pre>
+<pre><code>ls</code></pre>
+<pre><code>ls -Fal *</code></pre>
+<pre><code>ll *</code></pre>
 
-```
-xxxxxxx
-```
+<li>Moving around on the server</li>
+<pre><code>cd</code></pre>
+<pre><code>cd ..</code></pre>
+<pre><code>cd ../..</code></pre>
+<pre><code>cd ~</code></pre>
+<pre><code>cd workspace</code></pre>
 
+<li>Abssolute vs relative path</li>
+<pre><code>cd /home/vdw00</code></pre>
+<pre><code>cd ../</code></pre>
+<pre><code>cd ./vdw00</code></pre>
 
+<li>First step will be creating a working folder in workspace folder and moving into the freshly created directory</li>
+<pre><code>cd workspace
+mkdir -p metagenomics
+cd metagenomics</code></pre>
+To check if the location was changed, print working directory
+<pre><code>pwd</code></pre>
 
-### Setting up our folder for the analysis
+<li>Next, we will create other folders which will, help keep the analysis sorted</li> 
+<pre><code>mkdir -p data results scripts</code></pre>
+Then change permissions on all of the directories and in them:
+<pre><code>chmod -R a=rwx ./</code></pre>
+To check if everything was created correctly, list the current directory.
+<pre><code>ll *</code></pre>
 
-orientate yourself 
+<li>Let's go into data directory and copy our files</li><br>
+<pre><code>cd data</code></pre>
+Coping from website:
+<pre><code>wget <a href="https://">https://</a></code></pre>
+Alternatively, if the internet connection is slow, you can copy the data from backup location:
+<pre><code> cp -R /analyses/vdworkshop/.backup/data/* ./ </code></pre>
+Then change permission on the files and confirm the change on the data in the location:
+<pre><code>chmod a=rwx *
+ll *</code></pre>
+</ol>
 
-```
-pwd
-ls
-```
+<b><h3>Analysis</h3></b>
+<ol start=1>
+<h4><li>FastQC pre-Trimmomatic</li></h4>
+Let's create a script to execute this step
+<pre><code>cd ../scripts</code></pre>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br><br>
 
-Let's make a working folder
- 
-```
-mkdir metagenomics
-```
+We will use <i>nano</i> text editor. You can create empty file and open it to edit at the same time
+<pre><code>nano 01.fastqc_pretrim.sh</code></pre>
+<i>you can copy & paste the script text directly into the open document.</i><br>
 
-Go into the folder
+<pre><code>#!/bin/env bash
 
-```
-cd metagenomics
-```
-
-4. let's make other folders 
-
-```
-mkdir data results scripts
-ls
-```
-4. let's go into data and copy our files there
-
-```
-cd data
-cp xxxxxxx/lib* .
-ls
-```
-
-### 1. FastQC PRE Trimmomatic
-
-```
-cd metagenomics/scripts
-nano 
-```
-
-```
-code 03 
-#!/bin/env bash
-
-ON="module miniconda"
+THR=5
+### enabling conda environment and fastqc program
+ON="module miniconda && conda activate fastqc"
 eval $ON
-ON="conda activate fastqc"
-eval $ON
 
-#input and output directories
-input='/analyses/users/nokuzothan/disc_pipe/init_data/'
-output='/analyses/users/nokuzothan/disc_pipe/init_tools/fastqc_pre'
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input=${workdir}'/data'
+output=${workdir}'/results/01.fastqc_pretrim'
 
-#make output directory if it doesn't exist
-if [[ ! -d "${output}" ]]; then
-    mkdir "${output}"
-fi
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-#run fastqc
-for file in ${input}/*.fastq;do
-	fastqc ${file} -o ${output} -t 8
-done
+echo 'Running FastQC pre-trim'
 
+### run fastqc
+fastqc -t ${THR} -o ${output}/ ${input}/*.f*q*
 echo "Pretrim FastQC complete"
 
-```
+### deactivating fastqc program
+OFF='conda deactivate'
+eval ${OFF}
 
-### 2. Trimmomatic
+exit 0;
+</code></pre>
 
-```
-cd metagenomics/scripts
-nano 02.trimmomatic.sh
-```
-inside you will write:
+To save your script press ctrl+X then Y and ENTER<br>
+This will "override" the 01.fastqc_pretrim.sh (which was empty on opening)<br>
+You can change the name after pressing Y <br><br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx 01.fastqc_pretrim.sh</code></pre>
+To run the script type:
+<pre><code>bash 01.fastqc_pretrim.sh</code></pre>
 
-```
-#!/bin/env bash
+<h4><li>Trimmomatic</li></h4>
+Let's create another script for trimmomatic
+<pre><code>nano 02.trimmomatic.sh</code></pre>
+In the script, write (or copy & paste) the fallowing commands:<br>
 
-module trimmomatic
+<pre><code>#!/bin/env bash
 
-input="/analyses/users/nokuzothan/discovery_pipeline/init_tools/trimmo_test/input"
-output="/analyses/users/nokuzothan/discovery_pipeline/init_tools/trimmo_test/output"
-ADAPTERS="/analyses/software/programs/trimmomatic/0.39/adapters.fa"
+THR=5
+### activating program
+ON='module trimmomatic'
+eval ${ON}
+ 
+workdir=`realapth $(pwd) 2>/dev/null`'/../'
+input=${workdir}'/data'
+output=${workdir}'/results/02.trim_output'
+ADAPTERS=${input}'/adapters.fa'
 
-#first get the SRA ID as a variable using %%
-for file in $input/*_1.fastq;
+### getting the SRA IDs and creating output files
+for FOW in (ls ${input}/*.f*q* | grep -Ei "_r?1"); do
+  REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
+  ID=`basename ${FOW} | cut -d '_' -f1`
+  P1=${output}/${ID}'_1.P.fq.gz'
+  U1=${output}/${ID}'_1.U.fq.gz'
+  P2=${output}/${ID}'_2.P.fq.gz'
+  U1=${output}/${ID}'_2.U.fq.gz'
 
-do
-file_name=$(basename "$file")
-id=${file_name%%_1.fastq}
+  ### running program
+  trimmomatic PE -threads ${THR} -phred33 -summary ${output}/${ID}'_statsSummary.txt' \
+    ${FOW} ${REV} ${P1} ${U1} ${P2} ${U2} \
+    ILLUMINACLIP:"${ADAPTERS}":2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:5 MINLEN:25 \
+    2>>${output}/${ID}.log 1>>${output}/${ID}.log
 
-R1="$input/${id}_1.fastq"
-R2="$input/${id}_2.fastq"
-
-P1="${output}/${id}_P1.fastq"
-U1="${output}/${id}_U1.fastq"
-P2="${output}/${id}_P2.fastq"
-U2="${output}/${id}_U2.fastq"
-
-
-trimmomatic PE -threads 8 -phred33 -summary "${output}/${id}_statsSummary.txt" $R1 $R2 $P1 $U1 $P2 $U2 ILLUMINACLIP:"$ADAPTERS":2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:5 MINLEN:25 
-
-2>>"${output}/${id}.log" 1>>"${output}/${id}.log"
-
-echo "Trim run for $id complete"
+  echo "Trimming for ${ID} complete"
 done
-```
-and save it by "Write Out" in Nano:
-#### Ctrl + O 
+exit 0;
+</code></pre>
 
-If you want to save the changes to the existing file, simply press 
-#### Enter
+Save your script by pressing ctrl+X then Y and ENTER<br><br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx 02.trimmomatic.sh</code></pre>
+To run the script type:
+<pre><code>bash 02.trimmomatic.sh</code></pre>
 
-After saving, if you wish to exit the editor, press:
-#### Ctrl + X
+<h4><li>FastQC post-Trimmomatic</li></h4>
+Open new script file
+<pre><code>nano 03.fastqc_posttrim.sh</code></pre>
 
+<pre><code>#!/bin/env bash
 
-### 3. FastQC POST Trimmomatic 
-```
-#!/bin/env bash 
-
-#load fastqc module
-ON="module miniconda"
-eval $ON
-ON="conda activate fastqc"
-eval $ON
-
-#input and output directories
-input='/analyses/users/nokuzothan/disc_pipe/init_data/trimmomatic/output'
-output='/analyses/users/nokuzothan/disc_pipe/init_tools/fastqc_post'
-
-#make output directory if it doesn't exist
-if [[ ! -d "${output}" ]]; then
-    mkdir "${output}"
-fi
-
-#run fastqc
-for file in "${input}";do
-    fastqc ${file} -o ${output}
-done
-```
-
-
-### 4. MultiQC
-```
-#!/bin/env bash 
-
-#load fastqc module
-ON="module miniconda"
-eval $ON
-ON="conda activate fastqc"
+THR=5
+### enabling conda environment and fastqc program
+ON="module miniconda && conda activate fastqc"
 eval $ON
 
-#input and output directories
-input_pre='/analyses/users/nokuzothan/disc_pipe/init_data/fastqc_pre'
-input_post='/analyses/users/nokuzothan/disc_pipe/init_tools/fastqc_post'
-output='/analyses/users/nokuzothan/disc_pipe/init_tools/multiqc'
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input=${workdir}'/results/02.trim_output'
+output=${workdir}'/results/03.fastqc_posttrim'
 
-#make output directory if it doesn't exist
-if [[ ! -d "${output}" ]]; then
-    mkdir "${output}"
-fi
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-#run multiqc
-multiqc ${input_pre} ${input_post} -o ${output}
+echo 'Running FastQC post-trim'
 
-```
+### run fastqc
+fastqc -t ${THR} -o ${output}/ ${input}/*.P.fq.gz
+echo "Post-trim FastQC complete"
 
-### 5. MEGAHIT
+### deactivating fastqc program
+OFF='conda deactivate'
+eval ${OFF}
+
+exit 0;
+</code></pre>
+
+Save your script by pressing ctrl+X then Y and ENTER and change permissions
+<pre><code>chmod a=rwx 03.fastqc_posttrim.sh</code></pre>
+To run the script type:
+<pre><code>bash 03.fastqc_posttrim.sh</code></pre>
+
+<h4><li>MultiQC</li></h4>
+Let's create a script for this step
+<pre><code>nano 04.multiqc.sh</code></pre>
+In the script, write (or copy & paste) the fallowing commands:<br>
+
+<pre><code>#!/bin/env bash
+
+THR=5
+### enabling conda environment and fastqc program
+ON="module miniconda && conda activate fastqc"
+eval $ON
+
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input_pre=${workdir}'/results/01.fastqc_pretrim'
+input_post=${workdir}'/results/03.fastqc_posttrim'
+output=${workdir}'/results/04.multiqc'
+
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+
+### runnig multiqc
+### this will join both results, we would rather want to keep them separate to compare
+#multiqc ${input_pre} ${input_post} -o ${output}
+
+multiqc ${input_pre} -o ${output}/multiqc_pretrim
+multiqc ${input_post} -o ${output}/multiqc_posttrim
+
+### deactivating multiqc program
+OFF='conda deactivate'
+eval ${OFF}
+
+exit 0;
+</code></pre>
+
+Save your script by pressing ctrl+X then Y and ENTER and change permissions
+<pre><code>chmod a=rwx 04.multiqc.sh</code></pre>
+To run the script type:
+<pre><code>bash 04.multiqc.sh</code></pre>
+
+#################################################################################################
+<h4><li>MEGAHIT</li></h4>
 
 ```
 cd metagenomics/scripts
