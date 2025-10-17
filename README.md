@@ -4,7 +4,7 @@ Virus discovery pipeline created by Erin Harvey, Carla Mavian, Nokuzotha Nkiwane
 ### Metagenomic Workflow
 In this tutorial we will learn how to taxonomically classify and visualize our metagenomic reads obtained with Illumina using the following programs:
 
-1. [Fastp](https://github.com/OpenGene/fastp)
+1. [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 2. [Trimmomatic](https://github.com/usadellab/Trimmomatic)
 3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
