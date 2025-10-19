@@ -50,7 +50,7 @@ It is better to close the terminal and open it again and try again after the sec
 <pre><code>cd ~</code></pre>
 <pre><code>cd workspace</code></pre>
 
-<li>Abssolute vs relative path</li>
+<li>Absolute vs relative path</li>
 <pre><code>cd /home/vdw00</code></pre>
 <pre><code>cd ../</code></pre>
 <pre><code>cd ./vdw00</code></pre>
@@ -83,7 +83,7 @@ ll *</code></pre>
 <b><h3>Analysis</h3></b>
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
-Let's create a script to execute this step
+Let's create a script to execute this step in metagenomics/scripts directory
 <pre><code>cd ../scripts</code></pre>
 (<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br><br>
 
@@ -128,7 +128,8 @@ To run the script type:
 <pre><code>bash 01.fastqc_pretrim.sh</code></pre>
 
 <h4><li>Trimmomatic</li></h4>
-Let's create another script for trimmomatic
+Let's create another script for trimmomatic in metagenomics/scripts directory<br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
 <pre><code>nano 02.trimmomatic.sh</code></pre>
 In the script, write (or copy & paste) the fallowing commands:<br>
 
@@ -171,7 +172,8 @@ To run the script type:
 <pre><code>bash 02.trimmomatic.sh</code></pre>
 
 <h4><li>FastQC post-Trimmomatic</li></h4>
-Open new script file
+Open new script file in metagenomics/scripts directory<br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
 <pre><code>nano 03.fastqc_posttrim.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -208,7 +210,8 @@ To run the script type:
 <pre><code>bash 03.fastqc_posttrim.sh</code></pre>
 
 <h4><li>MultiQC</li></h4>
-Let's create a script for this step
+Let's create a script for this step in metagenomics/scripts directory<br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
 <pre><code>nano 04.multiqc.sh</code></pre>
 In the script, write (or copy & paste) the fallowing commands:<br>
 
@@ -247,271 +250,323 @@ Save your script by pressing ctrl+X then Y and ENTER and change permissions
 To run the script type:
 <pre><code>bash 04.multiqc.sh</code></pre>
 
-#################################################################################################
-<h4><li>MEGAHIT</li></h4>
+<h4><li>Megahit</li></h4>
+Create new script in metagenomics/scripts directory<br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+<pre><code>nano 05.megahit.sh</code></pre>
 
-```
-cd metagenomics/scripts
-nano 05.megahit.sh
-```
+<pre><code>#!/bin/env bash
 
-```
-#!/bin/env bash
-
-#load modules
+THR=5
+### enabling conda environment and megahit program
 ON="module miniconda && conda activate megahit"
 eval $ON
 
-#directories
-input="/analyses/users/nokuzothan/disc_pipe/init_tools/fastp_test/output"
-output="/analyses/users/nokuzothan/disc_pipe/init_tools/megahit/output/default"
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input=${workdir}'/results/02.trim_output'
+output=${workdir}'/results/05.megahit'
 
-#remove output directory if already exists and make new one
-if [[ -d ${output} ]]; then
-	rm -rf ${output}
-fi
-mkdir -p ${output}
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-#run megahit
-for file in ${input}/*__R1_001_out.fastq;do 
+### run megahit
+for FOW in (ls ${input}/*_1.P.fq.gz); do
+  REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
+  ID=`basename ${FOW} | cut -d '_' -f1`
+  
+  megahit --verbose -t ${THR} -1 ${R1} -2 ${R2} -o ${output}/${ID}
 
-	file_name=$(basename "$file")
-	id=${file_name%%__R1_001_out.fastq}
-	
-	R1=${input}/${id}__R1_001_out.fastq
-	R2=${input}/${id}__R2_001_out.fastq
+  ### after megahit run, prepend sample name to contigs 
+  ### (allows easier tracking of which contigs came from which sample in downstream analysis)
+  awk -v prefix="${ID}_" '/^>/ {$0=">" prefix substr($0,2)} {print}
+	' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
 
-	megahit --verbose -t 10 -1 ${R1} -2 ${R2} -o ${output}/${id}
-
-	#after megahit run, prepend sample name to contigs (allows easier tracking of which contigs came from which sample in downstream analysis)
-	awk -v prefix="${id}_" '
-        /^>/ {$0=">" prefix substr($0,2)} {print}
-    ' ${output}/${id}/final.contigs.fa > ${output}/${id}/sample.contigs.fa
-
+  echo "Megahit assmebly completed successfully and contigs named with sample name: ${ID}"
 done
 
-echo "Megahit assmebly completed successfully :-) and contigs named with sample name"
-```
+### deactivating megahit program
+OFF='conda deactivate'
+eval ${OFF}
 
-### 6. Diamond
+exit 0;
+</code></pre>
 
-```
-cd metagenomics/scripts
-nano 06.1.diamond_rvdb.sh
-```
+To save your script press ctrl+X then Y and ENTER<br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx 05.megahit.sh</code></pre>
 
-```
-#!/bin/env bash
+<h4><li>Diamond</li></h4>
+<ol start=i>
+<li>Create new script in metagenomics/scripts directory</li><br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+<pre><code>nano 06.diamond_rvdb.sh</code></pre>
 
-#load module
-module diamond
+<pre><code>#!/bin/env bash
+THR=5
+### enabling conda environment and diamond program
+ON="module miniconda && conda activate diamond"
+eval $ON
 
-# variables and directories
-wdir="/analyses/users/nokuzothan/disc_pipe"
-cdir="${wdir}/init_tools/diamond"
-input_reads_dir="${wdir}/init_tools/megahit/output/default"
-db="${wdir}/ncbidb/RVDB/v30.0/U-RVDBv30.0-prot.fasta"
-output="${cdir}/output/RVDB"
-threads=$((`/bin/nproc` -2))
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input=${workdir}'/results/05.megahit'
+output=${workdir}'/results/06.diamond_rvdb'
 
-#clear existing output directory if any, make new output directory 
-if [[ -e $output ]]; then
-  rm -rf ${output} 
-fi
-mkdir -p ${output}
+### DB variables and directories
+FASTA="${workdir}/data/diamond/RVDB/v30.0/U-RVDBv30.0-prot.fasta"
+DB='RVDB'
 
-#make diamond protein database
-diamond makedb --in ${db} -d ${output}/nr
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-#loop through each of the files created in megahit output directory to find final.contigs.fa files and run diamond
-for folder in ${input_reads_dir}/*; do
+### make diamond protein database
+if [[ ! -e ${output}/${DB} ]]; then
+  diamond makedb --in ${FASTA} -d ${output}/${DB}; fi
 
-  if [[ -d ${folder} ]]; then
-    sample=$(basename ${folder})
-    contigs=${folder}/sample.contigs.fa
+### loop through each of the files created in megahit output directory 
+### to find final.contigs.fa files and run diamond
+for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
+  ID=$(basename ${FOLDER})
+  CONTIGS=${FOLDER}/${ID}.contigs.fasta
 
-
-    #alignment using blastx (exclude --min-score because it overrides the evalue (acc. to manual))
-    if [[ -f ${contigs} ]]; then
-    sample_out=${output}/${sample}_rvdb.matches.m8
-    diamond blastx -d ${output}/nr.dmnd \
-    -q ${contigs} \
+  ### alignment using blastx
+  ### (exclude --min-score because it overrides the evalue (acc. to manual))
+  if [[ -f ${CONTIGS} ]]; then
+    sample_out=${output}/${${ID}_rvdb.matches.m8
+    diamond blastx -d ${output}/${RVDB}.dmnd \
+    -q ${CONTIGS} \
     --out ${sample_out} \
-    --threads ${threads} \
+    --threads ${THR} \
     --evalue 1E-5 \
-    --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
+    --outfmt "6 qseqid qlen sseqid stitle pident length evalue bitscore" \
     --id 80 \
     --strand both \
     --unal 0 \
     --mp-init 
-
-    else 
-      echo "Contigs file for ${sample} not found."
-    fi
+  else 
+    echo "Contigs file for ${ID} not found."
   fi
 done
 
-exit 0
-```
+exit 0;
+</code></pre>
 
-```
-cd metagenomics/scripts
-nano 06.2.nr_viral_seqs.sh
-```
+Save your script by pressing ctrl+X then Y and ENTER<br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx 06.diamond_rvdb.sh</code></pre>
 
-```
-#!/bin/env bash
+<li>Filtering viral sequencess from NCBI database</li><br>
+Create a script for NCBI database metagenomics/scripts directory<br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+<pre><code>nano 06.ncbidb.sh</code></pre>
 
-# variables and directories
-wdir="/analyses/users/nokuzothan/disc_pipe"
-cdir="${wdir}/init_tools/diamond/input"
-viruses_csv="${cdir}/virus_taxonomy_lvls.csv"
-names="${cdir}/viral_namess.txt"
-db="${wdir}/ncbidb/fasta/nr.faa"
-db_fasta="${cdir}/ncbi_fasta.faa"
-threads=$((`/bin/nproc` -2))
+<pre><code>#!/bin/env bash
 
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input=${workdir}'/data/ncbi'
+output=${workdir}'/results/06.ncbidb'
 
-#filter csv for viral sequences
-awk -F',' '{print $3}' ${viruses_csv} >> ${names}
+### variables and directories
+viral_csv=${input}'/virus_taxonomy_lvls.csv'
+viral_names=${input}'/viral_names.txt"
+input_db=${input}'/nr.faa'
+DBFASTA=${output}'/ncbi_fasta.fasta'
 
-#filter nr database for viral sequences 
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+
+### filter csv for viral sequences
+awk -F',' '{print $3}' ${viral_csv} >> ${viral_names}
+
+### filter nr database for viral sequences 
 while read -r virus; do
     awk -v name="${virus}" '
         BEGIN {IGNORECASE=1}
         /^>/ {ON = index($0, name) > 0}
         ON {print}
-    ' ${db} >> ${db_fasta}
-done < ${names}
+    ' ${input_db} >> ${DBFASTA}
+done < ${viral_names}
+exit 0;
+</code></pre>
+Save your script by pressing ctrl+X then Y and ENTER<br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx 06.ncbidb.sh</code></pre>
 
-```
+<li>Create another script for NCBI database in metagenomics/scripts directory</li><br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+<pre><code>nano 06.diamond_ncbi.sh</code></pre>
 
-```
-cd metagenomics/scripts
-nano 06.3.diamond_ncbi.sh
-```
+<pre><code>#!/bin/env bash
 
-```
-#!/bin/env bash
+THR=5
+### enabling conda environment and diamond program
+ON="module miniconda && conda activate diamond"
+eval $ON
 
-#load module
-module diamond
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input_db=${workdir}'/results/06.ncbidb'
+output=${workdir}'/results/06.diamond_ncbi'
+DBFASTA=${input_db}'/ncbi_fasta.fasta'
+DB='NCBI'
+input_reads=${workdir}'/results/05.megahit'
 
-# variables and directories
-wdir="/analyses/users/nokuzothan/disc_pipe"
-cdir="${wdir}/init_tools/diamond"
-input_reads_dir="${wdir}/init_tools/megahit/output/default"
-output="${cdir}/output/NCBI"
-db_fasta="${cdir}/input/ncbi_fasta.faa"
-threads=$((`/bin/nproc` -2))
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-#clear existing output directory if any, make new output directory 
-if [[ -e $output ]]; then
-  rm -rf ${output} 
-fi
-mkdir -p -m a=rwx ${output}
+### make diamond protein database
+if [[ ! -e ${output}/${DB} ]]; then
+  diamond makedb --in ${DBFASTA} -d ${output}/${DB}; fi
 
+### loop through each of the files created in megahit output directory 
+### to find final.contigs.fa files and run diamond
+for FOLDER in $(ls -dl ${input_reads}/* | grep ^d | awk '{print $9}'); do
+  ID=$(basename ${FOLDER})
+  CONTIGS=${FOLDER}/${ID}.contigs.fasta
 
-#make diamond protein database
-diamond makedb --in ${db_fasta} -d ${output}/nr
-
-#loop through each of the files created in megahit output directory to find final.congtigs.fa files and run diamond
-for folder in ls ${input_reads_dir}/*; do
-
-  if [[ -d ${folder} ]]; then
-    sample=$(basename ${folder})
-    contigs=${folder}/sample.contigs.fa
-
-
-    #alignment using blastx
-    if [[ -s ${contigs} ]]; then
-    sample_out=${output}/${sample}.matches.m8
-    diamond blastx -d ${output}/nr.dmnd \
-    -q ${contigs} \
+  ### alignment using blastx
+  ### (exclude --min-score because it overrides the evalue (acc. to manual))
+  if [[ -f ${CONTIGS} ]]; then
+    sample_out=${output}/${${ID}_ncbi.matches.m8
+    diamond blastx -d ${output}/${RVDB}.dmnd \
+    -q ${CONTIGS} \
     --out ${sample_out} \
-    --threads ${threads} \
+    --threads ${THR} \
     --evalue 1E-5 \
-    --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
+    --outfmt "6 qseqid qlen sseqid stitle pident length evalue bitscore" \
     --id 80 \
     --strand both \
     --unal 0 \
     --mp-init 
-
-    else 
-      echo "Contigs file for ${sample} not found."
-    fi
+  else 
+    echo "Contigs file for ${ID} not found."
   fi
 done
-```
 
+exit 0;
+</code></pre>
 
-### 7. Taxonomy
+Save your script by pressing ctrl+X then Y and ENTER<br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx 06.diamond_ncbi.sh</code></pre>
+</ol>
 
-```
-cd metagenomics/scripts
-nano 07.taxonomy.sh
-```
+<h4><li>Taxonomy</li></h4>
+Create new script in metagenomics/scripts directory<br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+<pre><code>nano 07.taxonomy.sh</code></pre>
 
-```
-#!/bin/env bash
+<pre><code>#!/bin/env bash
 
-#directories
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input=${workdir}'/results/06.diamond_ncbi' ####(???)
+input_ids=${workdir}/data/acc_ids.txt' ########(???)
+output=${workdir}'/results/07.' ###############(???)
+output_tsv=${output}'/taxonomy.tsv'
 
-xxxxxxxxx
+### make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-#function to get metadata from eutils
+### function to get metadata from eutils
 function get_meta {
     contig=$1
     length=$2
     acc_id=$3
-    columns=$4
-    output=$5
+    #columns=$4 ###########(???)
+    #output=$5
+	output=$4
 
-
-    #print ncbi page of protein accession and parse taxonomic id for use in taxonkit for lineage
-    url1="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${acc_id}&rettype=gb&retmode=text"
-    info=$(curl -L --retry 3 --connect-timeout 5 -N -# ${url1})
-    #taxonomic number
+    ### print ncbi page of protein accession and parse taxonomic id for use in taxonkit for lineage
+	  b1='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db='
+	  db='protein'
+	  b2='&id='
+	  b3='&rettype='
+	  file_type='gb'
+	  b4='&retmode='
+	  file_mode='text'
+	url="${b1}${db}${b2}${acc_id}${b3}${file_type}${b4}${file_mode}"
+    info=$(curl -L --retry 3 --connect-timeout 5 -N -# ${url})
+   
+	### taxonomic number
     tax=$(echo "${info}" | awk '/\/db_xref/ { match($0, /taxon:([0-9]+)/, tax_id); print tax_id[1] }')
 
-    #put NA if no taxonomy id found
-    if [[ -z "${tax}" ]]; then
-        tax="NA"
-    fi
+    ### put NA if no taxonomy id found
+    if [[ -z "${tax}" ]]; then tax="NA"; fi;
 
-    #print output
+    ### print output
     echo -e "${contig}\t${length}\t${acc_id}\t${rest}\t${tax}" >>"${output}"
-    sleep 0.34
+    sleep 1s
+}
+export -f get_meta
 
-} 
+### clear output file before each run
+rm -f ${output_tsv}
 
-#clear output file before each run
-> ${output_tsv}
+### adding empty line if there is none, else the file will be read incorrectly:
+if ! [[ `tail -n1 ${input_ids}` =~ ^$ ]]; then echo >> ${input_ids}; fi
 
-while IFS=$'\t' read -r col1 col2 col3 rest;do
-    echo "[${col3}]"
-    tmpfile=$(mktemp)
-        get_meta "${col1}" "${col2}" "${col3}" "${rest}" "${tmpfile}"
-        cat "${tmpfile}" >> "${output_tsv}"
-        rm "${tmpfile}"
-done < ${out}/acc_ids.txt
-```
+while read -r LN; do
+  ### skipping over empyt lines in file
+  if [[ `echo ${LN}` =~ ^$ ]]; then ontinue; fi
 
-### 8. Lineage filter
+  ### splitting columns into fixed positions in a list
+  unset TMP; declare -a TMP=(${LN})
+  echo '['${TMP[2]}']'
 
-```
-cd metagenomics/scripts
-nano 08.lineage_filter.sh
-```
+  ### creating temporary file
+  tmpfile=$(mktemp)
 
-```
-#!/bin/env bash
+  ### passing arguments to function (list index starts from possition 0)
+  get_meta ${TMP[0]} ${TMP[1]} ${TMP[2]} ${tmpfile}
 
-#load modules
-ON="module miniconda && conda activate viral_pipeline"
+  ### collecting results
+  cat ${tmpfile} >>${output_tsv}
+  rm -f ${tmpfile}
+done <"${input_ids}"
+
+### saving end-line delimiter before changing it
+#OLD_IFS=$IFS
+### ! it can be problematic when you play with IFS variable
+#while IFS=$'\t' read -r col1 col2 col3 rest;do
+#    echo "[${col3}]"
+#    tmpfile=$(mktemp)
+#        get_meta "${col1}" "${col2}" "${col3}" "${rest}" "${tmpfile}"
+#        cat "${tmpfile}" >> "${output_tsv}"
+#        rm "${tmpfile}"
+#done < ${out}/acc_ids.txt
+
+#restoring end-line character
+#export IFS=${OLD_IFS}
+
+exit 0;
+</code></pre>
+
+Save your script by pressing ctrl+X then Y and ENTER<br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx 07.taxonomy.sh</code></pre>
+
+#####################################################################################################
+<h4><li>Lineage filter</li></h4>
+Create new script in metagenomics/scripts directory<br>
+(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+<pre><code>nano 08.lineage_filter.sh</code></pre>
+
+<pre><code>#!/bin/env bash
+
+THR=5
+### enabling conda environment and viral_pipeline program
+ON="module miniconda && conda activate viral_pipeline" ##############(???)
 eval ${ON}
 
-#directories used
+### input and output directories
+workdir=`realpath $(pwd) 2>dev/null`'/../'
+input=${workdir}'/results/05.megahit'
+output=${workdir}'/results/06.diamond_rvdb'
+
+
 wdir="/analyses/users/nokuzothan/disc_pipe/init_tools"
 out="${wdir}/play"
 acc_tax_id="${out}/acc_tax_id.tsv"
