@@ -1,6 +1,6 @@
 <p><b><h1>VDM_workshop_2025_practical</h1></b></p>
 <h3>Virus discovery pipeline</h3>
-<i>created by</i> Erin Harvey, Carla Mavian, Nokuzotha Nkiwane, Eduan Wilkinson.
+<i>created by</i> Erin Harvey, Carla Mavian, Nokuzotha Nkiwane, TJ Sanko, Eduan Wilkinson.
 <i>(in alphabetical order)</i>
 
 <b><h3>Metagenomic Workflow</h3></b>
