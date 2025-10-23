@@ -71,7 +71,7 @@ To check if everything was created correctly, list the current directory.
 
 <li>Let's go into data directory and copy our files</li><br>
 <pre><code>cd data</code></pre>
-Coping from website:
+Downloading files from website:
 <pre><code>wget <a href="https://">https://</a></code></pre>
 Alternatively, if the internet connection is slow, you can copy the data from backup location:
 <pre><code> cp -R /analyses/vdworkshop/.backup/data/* ./ </code></pre>
@@ -85,9 +85,9 @@ ll *</code></pre>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
 Let's create a script to execute this step in metagenomics/scripts directory
 <pre><code>cd ../scripts</code></pre>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br><br>
+(<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br><br>
 
-We will use <i>nano</i> text editor. You can create empty file and open it to edit at the same time
+We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
 <pre><code>nano 01.fastqc_pretrim.sh</code></pre>
 <i>you can copy & paste the script text directly into the open document.</i><br>
 
@@ -128,10 +128,8 @@ To run the script type:
 <pre><code>bash 01.fastqc_pretrim.sh</code></pre>
 
 <h4><li>Trimmomatic</li></h4>
-Let's create another script for trimmomatic in metagenomics/scripts directory<br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
-<pre><code>nano 02.trimmomatic.sh</code></pre>
-In the script, write (or copy & paste) the fallowing commands:<br>
+Let's create another script for trimmomatic in the same directory<br>
+<pre><code>nano 02.trimmomatic.sh</code></pre><br>
 
 <pre><code>#!/bin/env bash
 
@@ -165,15 +163,12 @@ done
 exit 0;
 </code></pre>
 
-Save your script by pressing ctrl+X then Y and ENTER<br><br>
-Before running the script you have to change permissions
+Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx 02.trimmomatic.sh</code></pre>
-To run the script type:
 <pre><code>bash 02.trimmomatic.sh</code></pre>
 
 <h4><li>FastQC post-Trimmomatic</li></h4>
-Open new script file in metagenomics/scripts directory<br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+Open new script:<br>
 <pre><code>nano 03.fastqc_posttrim.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -204,16 +199,13 @@ eval ${OFF}
 exit 0;
 </code></pre>
 
-Save your script by pressing ctrl+X then Y and ENTER and change permissions
+Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx 03.fastqc_posttrim.sh</code></pre>
-To run the script type:
 <pre><code>bash 03.fastqc_posttrim.sh</code></pre>
 
 <h4><li>MultiQC</li></h4>
-Let's create a script for this step in metagenomics/scripts directory<br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+Let's create a script for this step<br>
 <pre><code>nano 04.multiqc.sh</code></pre>
-In the script, write (or copy & paste) the fallowing commands:<br>
 
 <pre><code>#!/bin/env bash
 
@@ -245,14 +237,12 @@ eval ${OFF}
 exit 0;
 </code></pre>
 
-Save your script by pressing ctrl+X then Y and ENTER and change permissions
+Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx 04.multiqc.sh</code></pre>
-To run the script type:
 <pre><code>bash 04.multiqc.sh</code></pre>
 
 <h4><li>Megahit</li></h4>
-Create new script in metagenomics/scripts directory<br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+Create new script:<br>
 <pre><code>nano 05.megahit.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -292,15 +282,14 @@ eval ${OFF}
 exit 0;
 </code></pre>
 
-To save your script press ctrl+X then Y and ENTER<br>
-Before running the script you have to change permissions
+Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx 05.megahit.sh</code></pre>
+<pre><code>bash 05.megahit.sh</code></pre>
 
 <h4><li>Diamond</li></h4>
 <ol start=i>
-<li>Create new script in metagenomics/scripts directory</li><br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
-<pre><code>nano 06.diamond_rvdb.sh</code></pre>
+<li>Create new script:</li><br>
+<pre><code>nano 06.1.diamond_rvdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 THR=5
@@ -311,7 +300,7 @@ eval $ON
 ### input and output directories
 workdir=`realpath $(pwd) 2>dev/null`'/../'
 input=${workdir}'/results/05.megahit'
-output=${workdir}'/results/06.diamond_rvdb'
+output=${workdir}'/results/06.1.diamond_rvdb'
 
 ### DB variables and directories
 FASTA="${workdir}/data/diamond/RVDB/v30.0/U-RVDBv30.0-prot.fasta"
@@ -352,26 +341,25 @@ done
 exit 0;
 </code></pre>
 
-Save your script by pressing ctrl+X then Y and ENTER<br>
-Before running the script you have to change permissions
-<pre><code>chmod a=rwx 06.diamond_rvdb.sh</code></pre>
+Save your script, change permissions and run the script.<br>
+<pre><code>chmod a=rwx 06.1.diamond_rvdb.sh</code></pre>
+<pre><code>bash 06.1.diamond_rvdb.sh</code></pre>
 
 <li>Filtering viral sequencess from NCBI database</li><br>
-Create a script for NCBI database metagenomics/scripts directory<br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
-<pre><code>nano 06.ncbidb.sh</code></pre>
+Create a script for NCBI database:<br>
+<pre><code>nano 06.2.ncbidb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
 ### input and output directories
 workdir=`realpath $(pwd) 2>dev/null`'/../'
 input=${workdir}'/data/ncbi'
-output=${workdir}'/results/06.ncbidb'
+output=${workdir}'/results/06.2.ncbidb'
 
 ### variables and directories
+input_db=${input}'/nr.faa'
 viral_csv=${input}'/virus_taxonomy_lvls.csv'
 viral_names=${input}'/viral_names.txt"
-input_db=${input}'/nr.faa'
 DBFASTA=${output}'/ncbi_fasta.fasta'
 
 ### make output directory if it doesn't exist
@@ -390,13 +378,13 @@ while read -r virus; do
 done < ${viral_names}
 exit 0;
 </code></pre>
-Save your script by pressing ctrl+X then Y and ENTER<br>
-Before running the script you have to change permissions
-<pre><code>chmod a=rwx 06.ncbidb.sh</code></pre>
 
-<li>Create another script for NCBI database in metagenomics/scripts directory</li><br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
-<pre><code>nano 06.diamond_ncbi.sh</code></pre>
+Save your script, change permissions and run the script.<br>
+<pre><code>chmod a=rwx 06.2.ncbidb.sh</code></pre>
+<pre><code>bash 06.2.ncbidb.sh</code></pre>
+
+<li>Create another script for diamond using NCBI database:</li><br>
+<pre><code>nano 06.3.diamond_ncbi.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -407,8 +395,8 @@ eval $ON
 
 ### input and output directories
 workdir=`realpath $(pwd) 2>dev/null`'/../'
-input_db=${workdir}'/results/06.ncbidb'
-output=${workdir}'/results/06.diamond_ncbi'
+input_db=${workdir}'/results/06.2.ncbidb'
+output=${workdir}'/results/06.3.diamond_ncbi'
 DBFASTA=${input_db}'/ncbi_fasta.fasta'
 DB='NCBI'
 input_reads=${workdir}'/results/05.megahit'
@@ -448,24 +436,23 @@ done
 exit 0;
 </code></pre>
 
-Save your script by pressing ctrl+X then Y and ENTER<br>
-Before running the script you have to change permissions
-<pre><code>chmod a=rwx 06.diamond_ncbi.sh</code></pre>
+Save your script, change permissions and run the script.<br>
+<pre><code>chmod a=rwx 06.3.diamond_ncbi.sh</code></pre>
+<pre><code>bash 06.3.diamond_ncbi.sh</code></pre>
 </ol>
 
 <h4><li>Taxonomy</li></h4>
-Create new script in metagenomics/scripts directory<br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+Create new script:<br>
 <pre><code>nano 07.taxonomy.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
 ### input and output directories
 workdir=`realpath $(pwd) 2>dev/null`'/../'
-input=${workdir}'/results/06.diamond_ncbi' ####(???)
+input=${workdir}'/results/06.3.diamond_ncbi' ####(???)
 input_ids=${workdir}/data/acc_ids.txt' ########(???)
 output=${workdir}'/results/07.' ###############(???)
-output_tsv=${output}'/taxonomy.tsv'
+output_tsv=${output}'/07.taxonomy.tsv'
 
 ### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
@@ -527,31 +514,15 @@ while read -r LN; do
   rm -f ${tmpfile}
 done <"${input_ids}"
 
-### saving end-line delimiter before changing it
-#OLD_IFS=$IFS
-### ! it can be problematic when you play with IFS variable
-#while IFS=$'\t' read -r col1 col2 col3 rest;do
-#    echo "[${col3}]"
-#    tmpfile=$(mktemp)
-#        get_meta "${col1}" "${col2}" "${col3}" "${rest}" "${tmpfile}"
-#        cat "${tmpfile}" >> "${output_tsv}"
-#        rm "${tmpfile}"
-#done < ${out}/acc_ids.txt
-
-#restoring end-line character
-#export IFS=${OLD_IFS}
-
 exit 0;
 </code></pre>
 
-Save your script by pressing ctrl+X then Y and ENTER<br>
-Before running the script you have to change permissions
+Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx 07.taxonomy.sh</code></pre>
+<pre><code>bash 07.taxonomy.sh</code></pre>
 
-#####################################################################################################
 <h4><li>Lineage filter</li></h4>
-Create new script in metagenomics/scripts directory<br>
-(<i>if you got lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br>
+Create new script:<br>
 <pre><code>nano 08.lineage_filter.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -563,68 +534,78 @@ eval ${ON}
 
 ### input and output directories
 workdir=`realpath $(pwd) 2>dev/null`'/../'
-input=${workdir}'/results/05.megahit'
-output=${workdir}'/results/06.diamond_rvdb'
+input=${workdir}'/results/07.taxonomy'
+output=${workdir}'/results/08.lineage_filter'
+
+acc_tax_id="${output}/acc_tax_id.tsv"
+u_match_out="${output}/unique_contig_ids.txt"
+lineage_out="${output}/lineages.tsv"
+contig_matches="${output}/contig_matches.tsv"
+output_fa="${output}/blast_fasta.fa"
+#mega_conts="${workdir}/results/05.megahit/output/default" (####### ???)
+
+for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
+  ID=$(basename ${FOLDER})
+  CONTIGS=${FOLDER}/${ID}.contigs.fasta
+
+  #fin_fasta=${mega_conts}/*/sample.contigs.fa
 
 
-wdir="/analyses/users/nokuzothan/disc_pipe/init_tools"
-out="${wdir}/play"
-acc_tax_id="${out}/acc_tax_id.tsv"
-lineage_out="${out}/lineages.tsv"
-u_match_out="${out}/unique_contig_ids.txt"
-contig_matches="${out}/contig_matches.tsv"
-output_fa="${out}/blast_fasta.fa"
-mega_conts="${wdir}/megahit/output/default"
-fin_fasta=${mega_conts}/*/sample.contigs.fa
+  ### clear lineage output files
+  if [[ -e ${lineage_out}    ]]; then rm -f ${lineage_out};    touch ${lineage_out};    fi
+  if [[ -e ${contig_matches} ]]; then rm -f ${contig_matches}; touch ${contig_matches}; fi
+  if [[ -e ${u_match_out}    ]]; then rm -f ${u_match_out};    touch ${u_match_out};    fi
+  if [[ -e ${output_fa}      ]]; then rm -f ${output_fa};      touch ${output_fa};      fi
 
+  ### get raw lineage information
+  echo "Retrieving lineage information"
+  taxonkit lineage -d $'\t' -i 9 ${acc_tax_id} > ${lineage_out}
 
-#clear lineage output files
-> ${lineage_out}
+  ### extract contig matches that are part of viruses
+  echo "Extracting contig matches that are part of viruses"
+  for LN in $(cat ${lineage_out}); do
+    if [[ `echo ${LN}` =~ ^$ ]]; then continue; fi
+	if [[ `echo ${LN} | grep -i 'Viruses'` ]]; then echo -e "${LN}\n" >>${contig_matches}; fi
+  done
+#  while read -r -a fields; do
+#    if [[ ${fields[9]} == *Viruses* ]]; then
+#        echo "${fields[2]}"
+#        printf "%s\t" "${fields[@]}" "\n" >> ${contig_matches}
+#        printf "\n" >> ${contig_matches}
+#    fi
+# done < ${lineage_out}
 
-#get raw lineage information
-echo "Retrieving lineage information"
-taxonkit lineage -d $'\t' -i 9 ${acc_tax_id} > ${lineage_out}
+  ### get unique contig matches
+  echo "Extract unique contig matches"
+  cat ${contig_matches} | awk '{print $1}' > ${u_match_out}
+  sort -u ${u_match_out} -o ${u_match_out}
 
-#contig filtering according to kingdom viruses
-#empty files before extraction
-> ${contig_matches}
-> ${u_match_out}
-> ${output_fa}
-
-#extract contig matches that are part of viruses
-echo "Extracting contig matches that are part of viruses"
-while IFS=$'\t' read -r -a fields; do
-    if [[ ${fields[9]} == *Viruses* ]]; then
-        echo "${fields[2]}"
-        printf "%s\t" "${fields[@]}" "\n" >> ${contig_matches}
-        printf "\n" >> ${contig_matches}
-    fi
-done < ${lineage_out}
-
-#get unique contig matches
-echo "Extract unique contig matches"
-cat ${contig_matches} | awk '{print $1}' > ${u_match_out}
-sort -u ${u_match_out} -o ${u_match_out}
-
-#find the contig matches in the final.contigs.fa file
-echo "Producing final blasta fasta with matches to blast against NT and NR"
-while read -r hit; do
-    if grep -qF ">${hit}" "${fin_fasta}"; then
+  ### find the contig matches in the final.contigs.fa file
+  echo "Producing final blasta fasta with matches to blast against NT and NR"
+  
+  while read -r hit; do
+    if grep -qF ">${hit}" "${CONTIGS}"; then
         awk -v contig=">${hit}" '
             $0 ~ ("^"contig) {print; ON=1; next}
             ON && /^>/ {exit}
             ON {print}
-        ' ${fin_fasta} >> ${output_fa}
+        ' ${CONTIGS} >> ${output_fa}
     fi
 
     #progress check
     echo "Sequence for ${hit} found"
-done < ${u_match_out}
+  done < "${u_match_out}"
+done
 
 exit 0
-```
+</code></pre>
+
+Save your script, change permissions and run the script.<br>
+<pre><code>chmod a=rwx 08.lineage_filter.sh</code></pre>
+<pre><code>bash 08.lineage_filter.sh</code></pre>
 
 
+##########################################################################
 ### 9. BlastN
 
 ```
