@@ -279,12 +279,12 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
 
-  megahit --verbose -t ${THR} -1 ${R1} -2 ${R2} -o ${output}/${ID}
+  megahit --verbose -t ${THR} -1 ${FOW} -2 ${REV} -o ${output}/${ID}
 
-  ### after megahit run, prepend sample name to contigs 
+  ### after megahit run, prepend sample name to contigs
   ### (allows easier tracking of which contigs came from which sample in downstream analysis)
   awk -v prefix="${ID}_" '/^>/ {$0=">" prefix substr($0,2)} {print}
-	' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
+    ' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
 
   echo "Megahit assmebly completed successfully and contigs named with sample name: ${ID}"
 done
