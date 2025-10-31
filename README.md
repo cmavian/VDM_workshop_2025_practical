@@ -278,8 +278,10 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 for FOW in $(ls ${input}/*_1.P.fq.gz); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
+  LOG= ${output}/${ID}/${ID}.log
 
-  megahit --verbose -t ${THR} -1 ${FOW} -2 ${REV} -o ${output}/${ID}
+  echo "assembling: ${ID}"
+  megahit -t ${THR} -1 ${FOW} -2 ${REV} -o ${output}/${ID} 1>${LOG} 2>${LOG}
 
   ### after megahit run, prepend sample name to contigs
   ### (allows easier tracking of which contigs came from which sample in downstream analysis)
