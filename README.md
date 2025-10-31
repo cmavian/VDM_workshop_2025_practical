@@ -169,12 +169,12 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx  scritps/02.trimmomatic.sh</code></pre>
-<pre><code>bash  scritps/02.trimmomatic.sh</code></pre>
+<pre><code>chmod a=rwx  scripts/02.trimmomatic.sh</code></pre>
+<pre><code>bash  scripts/02.trimmomatic.sh</code></pre>
 
 <h4><li>FastQC post-Trimmomatic</li></h4>
 Open new script:<br>
-<pre><code>nano scritps/03.fastqc_posttrim.sh</code></pre>
+<pre><code>nano scripts/03.fastqc_posttrim.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -205,12 +205,12 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx  scritps/03.fastqc_posttrim.sh</code></pre>
-<pre><code>bash  scritps/03.fastqc_posttrim.sh</code></pre>
+<pre><code>chmod a=rwx  scripts/03.fastqc_posttrim.sh</code></pre>
+<pre><code>bash  scripts/03.fastqc_posttrim.sh</code></pre>
 
 <h4><li>MultiQC</li></h4>
 Let's create a script for this step<br>
-<pre><code>nano  scritps/04.multiqc.sh</code></pre>
+<pre><code>nano  scripts/04.multiqc.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -243,12 +243,12 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx  scritps/04.multiqc.sh</code></pre>
-<pre><code>bash  scritps/04.multiqc.sh</code></pre>
+<pre><code>chmod a=rwx  scripts/04.multiqc.sh</code></pre>
+<pre><code>bash  scripts/04.multiqc.sh</code></pre>
 
 <h4><li>Megahit</li></h4>
 Create new script:<br>
-<pre><code>nano  scritps/05.megahit.sh</code></pre>
+<pre><code>nano  scripts/05.megahit.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -288,8 +288,8 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx  scritps/05.megahit.sh</code></pre>
-<pre><code>bash  scritps/05.megahit.sh</code></pre>
+<pre><code>chmod a=rwx  scripts/05.megahit.sh</code></pre>
+<pre><code>bash  scripts/05.megahit.sh</code></pre>
 
 <h4><li>Diamond</li></h4>
 <ol start=i>
