@@ -275,7 +275,7 @@ output=${workdir}'/results/05.megahit'
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### run megahit
-for FOW in (ls ${input}/*_1.P.fq.gz); do
+for FOW in $(ls ${input}/*_1.P.fq.gz); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
 
