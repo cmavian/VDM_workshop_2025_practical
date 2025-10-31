@@ -99,7 +99,7 @@ ON="module miniconda && conda activate fastqc"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`'/../'
 input=${workdir}'/data'
 output=${workdir}'/results/01.fastqc_pretrim'
 
@@ -179,7 +179,7 @@ ON="module miniconda && conda activate fastqc"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`'/../'
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/03.fastqc_posttrim'
 
@@ -215,7 +215,7 @@ ON="module miniconda && conda activate fastqc"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`'/../'
 input_pre=${workdir}'/results/01.fastqc_pretrim'
 input_post=${workdir}'/results/03.fastqc_posttrim'
 output=${workdir}'/results/04.multiqc'
@@ -253,7 +253,7 @@ ON="module miniconda && conda activate megahit"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/devnull`'/../'
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/05.megahit'
 
@@ -298,7 +298,7 @@ ON="module miniconda && conda activate diamond"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/devnull`'/../'
 input=${workdir}'/results/05.megahit'
 output=${workdir}'/results/06.1.diamond_rvdb'
 
@@ -352,7 +352,7 @@ Create a script for NCBI database:<br>
 <pre><code>#!/bin/env bash
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/devnull`'/../'
 input=${workdir}'/data/ncbi'
 output=${workdir}'/results/06.2.ncbidb'
 
@@ -394,7 +394,7 @@ ON="module miniconda && conda activate diamond"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/devnull`'/../'
 input_db=${workdir}'/results/06.2.ncbidb'
 output=${workdir}'/results/06.3.diamond_ncbi'
 DBFASTA=${input_db}'/ncbi_fasta.fasta'
@@ -448,7 +448,7 @@ Create new script:<br>
 <pre><code>#!/bin/env bash
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/devnull`'/../'
 input=${workdir}'/results/06.3.diamond_ncbi' ####(???)
 input_ids=${workdir}/data/acc_ids.txt' ########(???)
 output=${workdir}'/results/07.' ###############(???)
@@ -533,7 +533,7 @@ ON="module miniconda && conda activate viral_pipeline" ##############(???)
 eval ${ON}
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>dev/null`'/../'
+workdir=`realpath $(pwd) 2>/devnull`'/../'
 input=${workdir}'/results/07.taxonomy'
 output=${workdir}'/results/08.lineage_filter'
 
