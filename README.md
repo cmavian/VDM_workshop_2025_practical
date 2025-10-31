@@ -137,7 +137,7 @@ THR=5
 ### activating program
 ON='module trimmomatic'
 eval ${ON}
- 
+
 workdir=`realapth $(pwd) 2>/dev/null`'/../'
 input=${workdir}'/data'
 output=${workdir}'/results/02.trim_output'
