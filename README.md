@@ -330,7 +330,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 ### make diamond protein database
 if [[ ! -e ${output}/${DB} ]]; then
   diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
-chmod a=rwx ${output}/${DB}
+chmod a=rwx ${output}/${DB}*
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
@@ -341,7 +341,7 @@ for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
   ### alignment using blastx
   ### (exclude --min-score because it overrides the evalue (acc. to manual))
   if [[ -f ${CONTIGS} ]]; then
-    sample_out=${output}/${${ID}_rvdb.matches.m8
+    sample_out=${output}/${ID}_rvdb.matches.m8
     diamond blastx -d ${output}/${RVDB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
@@ -435,6 +435,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 ### make diamond protein database
 if [[ ! -e ${output}/${DB} ]]; then
   diamond makedb --in ${DBFASTA} --threads ${THR} -d ${output}/${DB}; fi
+chmod a=rwx ${output}/${DB}*
 
 ### loop through each of the files created in megahit output directory 
 ### to find final.contigs.fa files and run diamond
@@ -445,7 +446,7 @@ for FOLDER in $(ls -dl ${input_reads}/* | grep ^d | awk '{print $9}'); do
   ### alignment using blastx
   ### (exclude --min-score because it overrides the evalue (acc. to manual))
   if [[ -f ${CONTIGS} ]]; then
-    sample_out=${output}/${${ID}_ncbi.matches.m8
+    sample_out=${output}/${ID}_ncbi.matches.m8
     diamond blastx -d ${output}/${RVDB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
