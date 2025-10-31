@@ -321,7 +321,7 @@ input=${workdir}'/results/05.megahit'
 output=${workdir}'/results/06.1.diamond_rvdb'
 
 ### DB variables and directories
-FASTA="${workdir}/data/diamond/RVDB/v30.0/U-RVDBv30.0-prot.fasta"
+FASTA="${workdir}/data/database/U-RVDBv30.0-prot.fasta"
 DB='RVDB'
 
 ### make output directory if it doesn't exist
@@ -331,7 +331,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 if [[ ! -e ${output}/${DB} ]]; then
   diamond makedb --in ${FASTA} -d ${output}/${DB}; fi
 
-### loop through each of the files created in megahit output directory 
+### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
 for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
   ID=$(basename ${FOLDER})
