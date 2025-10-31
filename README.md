@@ -350,8 +350,8 @@ for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
     --id 80 \
     --strand both \
     --unal 0 \
-    --mp-init 
-  else 
+    --mp-init
+  else
     echo "Contigs file for ${ID} not found."
   fi
 done
@@ -454,8 +454,8 @@ for FOLDER in $(ls -dl ${input_reads}/* | grep ^d | awk '{print $9}'); do
     --id 80 \
     --strand both \
     --unal 0 \
-    --mp-init 
-  else 
+    --mp-init
+  else
     echo "Contigs file for ${ID} not found."
   fi
 done
