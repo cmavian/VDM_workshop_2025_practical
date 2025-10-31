@@ -244,6 +244,8 @@ multiqc ${input_post} -o ${output}/multiqc_posttrim
 OFF='conda deactivate'
 eval ${OFF}
 
+zip -9r ${output}/multiqc_pretrim.zip ${output}/multiqc_pretrim
+zip -9r ${output}/multiqc_posttrim.zip ${output}/multiqc_posttrim
 chmod -R a=rwx ${output}
 
 exit 0;
