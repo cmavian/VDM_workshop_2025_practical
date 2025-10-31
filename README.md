@@ -137,7 +137,7 @@ Let's create another script for trimmomatic in the same directory<br>
 
 THR=5
 ### activating program
-ON='module trimmomatic 2>/dev/null'
+ON='module trimmomatic 1>/dev/null 2>/dev/null'
 eval ${ON}
 
 workdir=`realpath $(pwd) 2>/dev/null`
@@ -158,6 +158,7 @@ for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
   U2=${output}/${ID}'_2.U.fq.gz'
 
   ### running program
+  echo "trimming: ${ID}"
   trimmomatic PE -threads ${THR} -phred33 -summary ${output}/${ID}'_statsSummary.txt' \
     ${FOW} ${REV} ${P1} ${U1} ${P2} ${U2} \
     ILLUMINACLIP:"${ADAPTERS}":2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:5 MINLEN:25 \
