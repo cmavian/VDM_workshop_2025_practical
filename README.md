@@ -334,32 +334,40 @@ chmod a=rwx ${output}/${DB}.dmnd
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
-for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
-  ID=$(basename ${FOLDER})
+function DBLX {
+ FOLDER=$1; OUT=$2; DB=$3; T=$;
+  ID=$(basename $1)
   CONTIGS=${FOLDER}/${ID}.contigs.fasta
+  LOG=${OUT}/${ID}.log
 
-  ### alignment using blastx
-  ### (exclude --min-score because it overrides the evalue (acc. to manual))
   if [[ -f ${CONTIGS} ]]; then
-    sample_out=${output}/${ID}_rvdb.matches.m8
-    diamond blastx -d ${output}/${DB}.dmnd \
+    sample_out=${OUT}/${ID}_rvdb.blastx
+    diamond blastx -d ${OUT}/${DB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
-    --threads ${THR} \
+    --threads ${T} \
     --evalue 1e-5 \
     --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
     --id 80 \
     --strand both \
     --unal 0 \
-    --mp-init
+    --mp-init 1>${LOG} 2>${LOG}
   else
     echo "Contigs file for ${ID} not found."
   fi
-done
 
-### deactivating diamond program
-OFF='conda deactivate'
-eval ${OFF}
+
+}
+export -f DBLX
+
+PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
+if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
+ ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1
+else
+ for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
+  DBLX ${FOLDER} ${output} ${DB} 1
+ done
+fi
 
 chmod -R a=rwx ${output}
 
