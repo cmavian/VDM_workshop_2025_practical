@@ -329,7 +329,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
 if [[ ! -e ${output}/${DB} ]]; then
-  diamond makedb --in ${FASTA} -d ${output}/${DB}; fi
+  diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
@@ -433,7 +433,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
 if [[ ! -e ${output}/${DB} ]]; then
-  diamond makedb --in ${DBFASTA} -d ${output}/${DB}; fi
+  diamond makedb --in ${DBFASTA} --threads ${THR} -d ${output}/${DB}; fi
 
 ### loop through each of the files created in megahit output directory 
 ### to find final.contigs.fa files and run diamond
