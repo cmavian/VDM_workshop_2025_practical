@@ -330,6 +330,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 ### make diamond protein database
 if [[ ! -e ${output}/${DB} ]]; then
   diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
+chmod a=rwx ${output}/${DB}
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
