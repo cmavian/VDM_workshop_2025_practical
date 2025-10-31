@@ -312,7 +312,7 @@ Save your script, change permissions and run the script.<br>
 <pre><code>#!/bin/env bash
 THR=5
 ### enabling conda environment and diamond program
-ON="module miniconda && conda activate diamond"
+ON="module diamond 1>/dev/null 2>/dev/null"
 eval $ON
 
 ### input and output directories
@@ -356,6 +356,10 @@ for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
   fi
 done
 
+### deactivating diamond program
+OFF='conda deactivate'
+eval ${OFF}
+
 chmod -R a=rwx ${output}
 
 exit 0;
@@ -372,7 +376,7 @@ Create a script for NCBI database:<br>
 <pre><code>#!/bin/env bash
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/data/ncbi'
 output=${workdir}'/results/06.2.ncbidb'
 
@@ -396,25 +400,28 @@ while read -r virus; do
         ON {print}
     ' ${input_db} >> ${DBFASTA}
 done < ${viral_names}
+
+chmod -R a=rwx ${output}
+
 exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 06.2.ncbidb.sh</code></pre>
-<pre><code>bash 06.2.ncbidb.sh</code></pre>
+<pre><code>chmod a=rwx scripts/06.2.ncbidb.sh</code></pre>
+<pre><code>bash scripts/06.2.ncbidb.sh</code></pre>
 
 <li>Create another script for diamond using NCBI database:</li><br>
-<pre><code>nano 06.3.diamond_ncbi.sh</code></pre>
+<pre><code>nano scripts/06.3.diamond_ncbi.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
 THR=5
 ### enabling conda environment and diamond program
-ON="module miniconda && conda activate diamond"
+ON="module diamond 1>/dev/null 2>/dev/null"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`
 input_db=${workdir}'/results/06.2.ncbidb'
 output=${workdir}'/results/06.3.diamond_ncbi'
 DBFASTA=${input_db}'/ncbi_fasta.fasta'
@@ -453,22 +460,28 @@ for FOLDER in $(ls -dl ${input_reads}/* | grep ^d | awk '{print $9}'); do
   fi
 done
 
+### deactivating diamond program
+OFF='conda deactivate'
+eval ${OFF}
+
+chmod -R a=rwx ${output}
+
 exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 06.3.diamond_ncbi.sh</code></pre>
-<pre><code>bash 06.3.diamond_ncbi.sh</code></pre>
+<pre><code>chmod a=rwx scripts/06.3.diamond_ncbi.sh</code></pre>
+<pre><code>bash scripts/06.3.diamond_ncbi.sh</code></pre>
 </ol>
 
 <h4><li>Taxonomy</li></h4>
 Create new script:<br>
-<pre><code>nano 07.taxonomy.sh</code></pre>
+<pre><code>nano scripts/07.taxonomy.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`'/../'
+workdir=`realpath $(pwd) 2>/devnull`
 input=${workdir}'/results/06.3.diamond_ncbi' ####(???)
 input_ids=${workdir}/data/acc_ids.txt' ########(???)
 output=${workdir}'/results/07.' ###############(???)
@@ -534,12 +547,14 @@ while read -r LN; do
   rm -f ${tmpfile}
 done <"${input_ids}"
 
+chmod -R a=rwx ${output}
+
 exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 07.taxonomy.sh</code></pre>
-<pre><code>bash 07.taxonomy.sh</code></pre>
+<pre><code>chmod a=rwx scripts/07.taxonomy.sh</code></pre>
+<pre><code>bash scripts/07.taxonomy.sh</code></pre>
 
 <h4><li>Lineage filter</li></h4>
 Create new script:<br>
