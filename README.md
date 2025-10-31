@@ -84,11 +84,13 @@ ll *</code></pre>
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
 Let's create a script to execute this step in metagenomics/scripts directory
-<pre><code>cd ../scripts</code></pre>
-(<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics/scripts</code>)<br><br>
+<pre><code>cd /analyses/vdworkshop/${USER}</code></pre>
+or
+<pre><code>cd ~/workspace</code></code></pre>
+(<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics</code>)<br><br>
 
 We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
-<pre><code>nano 01.fastqc_pretrim.sh</code></pre>
+<pre><code>nano scripts/01.fastqc_pretrim.sh</code></pre>
 <i>you can copy & paste the script text directly into the open document.</i><br>
 
 <pre><code>#!/bin/env bash
@@ -99,8 +101,8 @@ ON="module miniconda && conda activate fastqc"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/dev/null`'/../'
-input=${workdir}'/data'
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/data/fastq'
 output=${workdir}'/results/01.fastqc_pretrim'
 
 ### make output directory if it doesn't exist
@@ -123,34 +125,37 @@ To save your script press ctrl+X then Y and ENTER<br>
 This will "override" the 01.fastqc_pretrim.sh (which was empty on opening)<br>
 You can change the name after pressing Y <br><br>
 Before running the script you have to change permissions
-<pre><code>chmod a=rwx 01.fastqc_pretrim.sh</code></pre>
+<pre><code>chmod a=rwx scripts/01.fastqc_pretrim.sh</code></pre>
 To run the script type:
-<pre><code>bash 01.fastqc_pretrim.sh</code></pre>
+<pre><code>bash scripts/01.fastqc_pretrim.sh</code></pre>
 
 <h4><li>Trimmomatic</li></h4>
 Let's create another script for trimmomatic in the same directory<br>
-<pre><code>nano 02.trimmomatic.sh</code></pre><br>
+<pre><code>nano scripts/02.trimmomatic.sh</code></pre><br>
 
 <pre><code>#!/bin/env bash
 
 THR=5
 ### activating program
-ON='module trimmomatic'
+ON='module trimmomatic 2>/dev/null'
 eval ${ON}
 
-workdir=`realapth $(pwd) 2>/dev/null`'/../'
-input=${workdir}'/data'
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/data/fastq'
 output=${workdir}'/results/02.trim_output'
-ADAPTERS=${input}'/adapters.fa'
+ADAPTERS=${workdir}'/data/adapters.fa'
+
+### make output directory if it doesn't exist
+if [[ ! -e ${output} ]]; then mkdir -p ${output}; fi
 
 ### getting the SRA IDs and creating output files
-for FOW in (ls ${input}/*.f*q* | grep -Ei "_r?1"); do
+for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
   P1=${output}/${ID}'_1.P.fq.gz'
   U1=${output}/${ID}'_1.U.fq.gz'
   P2=${output}/${ID}'_2.P.fq.gz'
-  U1=${output}/${ID}'_2.U.fq.gz'
+  U2=${output}/${ID}'_2.U.fq.gz'
 
   ### running program
   trimmomatic PE -threads ${THR} -phred33 -summary ${output}/${ID}'_statsSummary.txt' \
@@ -164,12 +169,12 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 02.trimmomatic.sh</code></pre>
-<pre><code>bash 02.trimmomatic.sh</code></pre>
+<pre><code>chmod a=rwx  scritps/02.trimmomatic.sh</code></pre>
+<pre><code>bash  scritps/02.trimmomatic.sh</code></pre>
 
 <h4><li>FastQC post-Trimmomatic</li></h4>
 Open new script:<br>
-<pre><code>nano 03.fastqc_posttrim.sh</code></pre>
+<pre><code>nano scritps/03.fastqc_posttrim.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -179,7 +184,7 @@ ON="module miniconda && conda activate fastqc"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/dev/null`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/03.fastqc_posttrim'
 
@@ -200,12 +205,12 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 03.fastqc_posttrim.sh</code></pre>
-<pre><code>bash 03.fastqc_posttrim.sh</code></pre>
+<pre><code>chmod a=rwx  scritps/03.fastqc_posttrim.sh</code></pre>
+<pre><code>bash  scritps/03.fastqc_posttrim.sh</code></pre>
 
 <h4><li>MultiQC</li></h4>
 Let's create a script for this step<br>
-<pre><code>nano 04.multiqc.sh</code></pre>
+<pre><code>nano  scritps/04.multiqc.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -238,12 +243,12 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 04.multiqc.sh</code></pre>
-<pre><code>bash 04.multiqc.sh</code></pre>
+<pre><code>chmod a=rwx  scritps/04.multiqc.sh</code></pre>
+<pre><code>bash  scritps/04.multiqc.sh</code></pre>
 
 <h4><li>Megahit</li></h4>
 Create new script:<br>
-<pre><code>nano 05.megahit.sh</code></pre>
+<pre><code>nano  scritps/05.megahit.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -253,7 +258,7 @@ ON="module miniconda && conda activate megahit"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`'/../'
+workdir=`realpath $(pwd) 2>/devnull`
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/05.megahit'
 
@@ -283,8 +288,8 @@ exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 05.megahit.sh</code></pre>
-<pre><code>bash 05.megahit.sh</code></pre>
+<pre><code>chmod a=rwx  scritps/05.megahit.sh</code></pre>
+<pre><code>bash  scritps/05.megahit.sh</code></pre>
 
 <h4><li>Diamond</li></h4>
 <ol start=i>
