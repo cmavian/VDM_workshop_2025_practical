@@ -307,7 +307,7 @@ Save your script, change permissions and run the script.<br>
 <h4><li>Diamond</li></h4>
 <ol start=i>
 <li>Create new script:</li><br>
-<pre><code>nano 06.1.diamond_rvdb.sh</code></pre>
+<pre><code>nano scripts/06.1.diamond_rvdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 THR=5
@@ -316,7 +316,7 @@ ON="module miniconda && conda activate diamond"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/05.megahit'
 output=${workdir}'/results/06.1.diamond_rvdb'
 
@@ -356,12 +356,14 @@ for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
   fi
 done
 
+chmod -R a=rwx ${output}
+
 exit 0;
 </code></pre>
 
 Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 06.1.diamond_rvdb.sh</code></pre>
-<pre><code>bash 06.1.diamond_rvdb.sh</code></pre>
+<pre><code>chmod a=rwx scripts/06.1.diamond_rvdb.sh</code></pre>
+<pre><code>bash scripts/06.1.diamond_rvdb.sh</code></pre>
 
 <li>Filtering viral sequencess from NCBI database</li><br>
 Create a script for NCBI database:<br>
