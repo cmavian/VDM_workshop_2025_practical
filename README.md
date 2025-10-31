@@ -328,9 +328,9 @@ DB='RVDB'
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
-if [[ ! -e ${output}/${DB} ]]; then
+if [[ ! -e ${output}/${DB}.dmnd ]]; then
   diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
-chmod a=rwx ${output}/${DB}*
+chmod a=rwx ${output}/${DB}.dmnd
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
@@ -342,12 +342,12 @@ for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
   ### (exclude --min-score because it overrides the evalue (acc. to manual))
   if [[ -f ${CONTIGS} ]]; then
     sample_out=${output}/${ID}_rvdb.matches.m8
-    diamond blastx -d ${output}/${RVDB}.dmnd \
+    diamond blastx -d ${output}/${DB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
     --threads ${THR} \
-    --evalue 1E-5 \
-    --outfmt "6 qseqid qlen sseqid stitle pident length evalue bitscore" \
+    --evalue 1e-5 \
+    --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
     --id 80 \
     --strand both \
     --unal 0 \
@@ -433,9 +433,9 @@ input_reads=${workdir}'/results/05.megahit'
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
-if [[ ! -e ${output}/${DB} ]]; then
+if [[ ! -e ${output}/${DB}.dmnd ]]; then
   diamond makedb --in ${DBFASTA} --threads ${THR} -d ${output}/${DB}; fi
-chmod a=rwx ${output}/${DB}*
+chmod a=rwx ${output}/${DB}.dmnd
 
 ### loop through each of the files created in megahit output directory 
 ### to find final.contigs.fa files and run diamond
@@ -447,12 +447,12 @@ for FOLDER in $(ls -dl ${input_reads}/* | grep ^d | awk '{print $9}'); do
   ### (exclude --min-score because it overrides the evalue (acc. to manual))
   if [[ -f ${CONTIGS} ]]; then
     sample_out=${output}/${ID}_ncbi.matches.m8
-    diamond blastx -d ${output}/${RVDB}.dmnd \
+    diamond blastx -d ${output}/${DB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
     --threads ${THR} \
-    --evalue 1E-5 \
-    --outfmt "6 qseqid qlen sseqid stitle pident length evalue bitscore" \
+    --evalue 1e-5 \
+    --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
     --id 80 \
     --strand both \
     --unal 0 \
