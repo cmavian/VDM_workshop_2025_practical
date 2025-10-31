@@ -117,6 +117,7 @@ echo "Pretrim FastQC complete"
 ### deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
+chmod -R a=rwx ${output}
 
 exit 0;
 </code></pre>
@@ -166,6 +167,7 @@ for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
 
   echo "Trimming for ${ID} complete"
 done
+chmod -R a=rwx ${output}
 exit 0;
 </code></pre>
 
@@ -181,7 +183,7 @@ Open new script:<br>
 
 THR=5
 ### enabling conda environment and fastqc program
-ON="module miniconda && conda activate fastqc"
+ON="module miniconda && conda activate fastqc 1>/dev/null 2>/dev/null"
 eval $ON
 
 ### input and output directories
@@ -202,6 +204,8 @@ echo "Post-trim FastQC complete"
 OFF='conda deactivate'
 eval ${OFF}
 
+chmod -R a=rwx ${output}
+
 exit 0;
 </code></pre>
 
@@ -217,11 +221,11 @@ Let's create a script for this step<br>
 
 THR=5
 ### enabling conda environment and fastqc program
-ON="module miniconda && conda activate fastqc"
+ON="module miniconda && conda activate fastqc 1>/dev/null 2>/dev/null"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/dev/null`'/../'
+workdir=`realpath $(pwd) 2>/dev/null`
 input_pre=${workdir}'/results/01.fastqc_pretrim'
 input_post=${workdir}'/results/03.fastqc_posttrim'
 output=${workdir}'/results/04.multiqc'
@@ -240,6 +244,8 @@ multiqc ${input_post} -o ${output}/multiqc_posttrim
 OFF='conda deactivate'
 eval ${OFF}
 
+chmod -R a=rwx ${output}
+
 exit 0;
 </code></pre>
 
@@ -255,11 +261,11 @@ Create new script:<br>
 
 THR=5
 ### enabling conda environment and megahit program
-ON="module miniconda && conda activate megahit"
+ON="module miniconda && conda activate megahit 1>/dev/null 2>/dev/null"
 eval $ON
 
 ### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`
+workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/05.megahit'
 
@@ -284,6 +290,8 @@ done
 ### deactivating megahit program
 OFF='conda deactivate'
 eval ${OFF}
+
+chmod -R a=rwx ${output}
 
 exit 0;
 </code></pre>
