@@ -278,7 +278,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 for FOW in (ls ${input}/*_1.P.fq.gz); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
-  
+
   megahit --verbose -t ${THR} -1 ${R1} -2 ${R2} -o ${output}/${ID}
 
   ### after megahit run, prepend sample name to contigs 
