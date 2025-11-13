@@ -87,16 +87,10 @@ In this section we will create scripts to execute each step. The scripts will be
 We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
 <pre><code>nano scripts/<script_name>.sh</code></pre>
 <i>you can copy & paste the script text directly into the open document.</i><br>
-To save your script press ctrl+X then Y and ENTER<br>
-This will "override" the <script_name>.sh (which was empty on opening)<br>
-You can change the name after pressing 'Y'<br><br>
-Before running the script you have to change permissions
-<pre><code>chmod a=rwx scripts/<script_name>.sh</code></pre>
-To run the script type:
-<pre><code>bash scripts/<script_name>.sh</code></pre>
-
-
-
+To save any of your scripts, press ctrl+X then Y and ENTER. This will "override" the <script_name>.sh (which was empty on opening)<br>
+You can change the name after pressing 'Y'.<br>
+Before running the script you have to change permissions <pre><code>chmod a=rwx scripts/<script_name>.sh</code></pre>
+To run the script type: <pre><code>bash scripts/<script_name>.sh</code></pre><br>
 
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
