@@ -56,7 +56,7 @@ It is better to close the terminal and open it again and try again after the sec
 <pre><code>cd ./vdw00</code></pre>
 
 <li>First step will be creating a working folder in workspace folder and moving into the freshly created directory</li>
-<pre><code>cd workspace
+<pre><code>cd ~/workspace
 mkdir -p metagenomics
 cd metagenomics</code></pre>
 To check if the location was changed, print working directory
@@ -65,7 +65,7 @@ To check if the location was changed, print working directory
 <li>Next, we will create other folders which will, help keep the analysis sorted</li> 
 <pre><code>mkdir -p data results scripts</code></pre>
 Then change permissions on all of the directories and in them:
-<pre><code>chmod -R a=rwx ./</code></pre>
+<pre><code>chmod -R a=rwx *</code></pre>
 To check if everything was created correctly, list the current directory.
 <pre><code>ll *</code></pre>
 
@@ -81,6 +81,23 @@ ll *</code></pre>
 </ol>
 
 <b><h3>Analysis</h3></b>
+In this section we will create scripts to execute each step. The scripts will be located in metagenomics/scripts directory.
+<pre><code>cd ~/workspace/metagenomics</code></code></pre>
+(<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics</code>)<br><br>
+We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
+<pre><code>nano scripts/<script_name>.sh</code></pre>
+<i>you can copy & paste the script text directly into the open document.</i><br>
+To save your script press ctrl+X then Y and ENTER<br>
+This will "override" the <script_name>.sh (which was empty on opening)<br>
+You can change the name after pressing 'Y'<br><br>
+Before running the script you have to change permissions
+<pre><code>chmod a=rwx scripts/<script_name>.sh</code></pre>
+To run the script type:
+<pre><code>bash scripts/<script_name>.sh</code></pre>
+
+
+
+
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
 Let's create a script to execute this step in metagenomics/scripts directory
