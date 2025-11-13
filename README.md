@@ -285,7 +285,7 @@ exit 0; </code></pre>
 
 <pre><code>#!/bin/env bash
 THR=5
-### enabling conda environment and diamond program
+### enabling diamond program
 ON="module diamond 1>/dev/null 2>/dev/null"
 eval $ON
 
@@ -357,7 +357,7 @@ exit 0; </code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
-### enabling conda environment and diamond program
+### enabling diamond program
 ON="module diamond 1>/dev/null 2>/dev/null"
 eval $ON
 
@@ -461,10 +461,10 @@ cat ${nrdb_in}/*_nrdb.blastx > ${nrdb_out}
 
 echo "[INFO] Filtering for viral hits..."
 
-grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
+grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
 grep -Ei "vir[us|idae|oid]" ${nrdb_out} > ${nrdb_virus}
 
-#grep -Ei "virus|viridae|viroid" ${rvdb_out} > ${rvdb_virus}
+#grep -Ei "virus|viridae|viroid" ${rvdb_out} > ${rvdb_virus}
 #grep -Ei "virus|viridae|viroid" ${nrdb_out} > ${nrdb_virus}
 
 echo "[INFO] Extracting unique contig names..."
@@ -500,8 +500,9 @@ exit 0; </code></pre>
 <li>Filtering viral sequences from NCBI nucleotide database</li><br>
 <pre><code>nano scripts/08.ncbi_ntdb.sh</code></pre>
 <pre><code>#!/bin/env bash
+
 THR=5
-###### enabling BLAST program
+###enabling BLAST program
 ON='module ncbi'
 eval ${ON}
 
@@ -524,7 +525,6 @@ Running BLASTN against nt database...
 Query: ${input}
 DB:    ${DB}
 "
-
 blastn \
     -db ${DB} \
     -query ${input} \
@@ -546,6 +546,260 @@ exit 0; </code></pre>
 <pre><code>chmod a=rwx scripts/08.ncbi_ntdb.sh</code></pre>
 <pre><code>bash scripts/08.ncbi_ntdb.sh</code></pre>
 
+<li>Combining and filtering sequences from NCBI nucleotide database</li><br>
+<pre><code>nano scripts/09.blastn_filtered</code></pre>
+<pre><code>#!/bin/env bash
 
+###input and output directories
+workdir=`realpath $(pwd) 2>/dev/null`
+blast_in=${workdir}'/results/08.ncbi_ntdb'
+output=${workdir}'/results/07.combine/08.ncbi_ntdb'
+input_db=${workdir}'/data/database'
+output=${workdir}'/results/09.blastn_filtered'
 
+virus_hits_list=${output}'/combined_blastn.virus_hits.blastn'
+unique_ids=${output}'/unique_ncbi_ntdb_contigs.txt'
+viral_fasta=${output}'/viral_contigs_blastn.fasta'
 
+###make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+
+echo "[INFO] Filtering BLASTn outputs for viral hits..."
+
+###Combine and filter
+cat ${blastn_in}/*.blastn | grep -Ei "vir[us|idae|oid]" > ${virus_hits_list}
+
+echo "[INFO] Extracting unique contig IDs..."
+awk '{print $1}' ${virus_hits_list} | sort -u > ${unique_ids}
+
+echo "[COUNT] Number of unique viral contigs:"
+wc -l ${unique_ids}
+
+###Activate seqkit
+ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
+eval "${ON}"
+
+echo "[INFO] Extracting viral contigs using seqkit..."
+seqkit grep -f ${unique_ids} ${combined_contigs} > ${viral_fasta}
+
+OFF='conda deactivate'
+eval ${OFF}
+
+echo -en "
+[DONE]
+Viral hits table:          ${virus_hits_list}
+Unique contig list:        ${unique_ids}
+Viral contigs FASTA:       ${viral_fasta}
+Output directory:          ${output}
+"
+exit 0; </code></pre>
+<pre><code>chmod a=rwx scripts/09.blastn_filtered</code></pre>
+<pre><code>bash scripts/09.blastn_filtered</code></pre>
+
+<li>Combining and filtering sequences from NCBI nucleotide database</li><br>
+<pre><code>nano scripts/10.diamond_blastx_blastn_contigs</code></pre>
+<pre><code>#!/bin/env bash
+
+THR=5
+###enabling diamond program
+ON="module diamond 1>/dev/null 2>/dev/null"
+eval $ON
+
+###input and output directories
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
+output=${workdir}'/results/07.combine/10.diamond_blastx_blastn_contigs'
+
+###DB variables and directories
+FASTA="${input_db}/nr.faa"
+DB='NRDB'
+if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
+
+###make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+
+###make diamond protein database
+if [[ ! -e ${output}/${DB}.dmnd ]]; then
+  diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
+chmod a=rwx ${output}/${DB}.dmnd
+
+echo "[INFO] Using existing DIAMOND DB:"
+echo " ${DB}"
+
+echo "[INFO] Running DIAMOND blastx..."
+diamond blastx \
+    -d ${DB} \
+    -q ${input} \
+    --out ${output}'/viral_contigs_NR.blastx' \
+    --threads ${THR} \
+    --evalue 1e-5 \
+    --max-target-seqs 25 \
+    --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
+    --id 80 \
+    --strand both \
+    --unal 0 \
+    2> ${output}'/diamond.log'
+
+chmod -R a=rwx ${output}
+
+echo -en "
+[DONE]
+DIAMOND results: ${output}/viral_contigs_NR.blastx
+Log:             ${output}/diamond.log
+"
+exit 0; </code></pre>
+<pre><code>chmod a=rwx scripts/10.diamond_blastx_blastn_contigs</code></pre>
+<pre><code>bash scripts/10.diamond_blastx_blastn_contigs</code></pre>
+
+<li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
+<pre><code>nano scripts/11.genbank_fetch</code></pre>
+<pre><code>#!/bin/env bash
+
+###input and output directories
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/10.diamond_blastx_blastn_contigs'
+output=${workdir}'/results/11.genbank_fetch'
+gb_final="${output}/11.final_gb.gb"
+
+#set -euo pipefail
+
+###make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+
+for FILE in $(ls ${input}/*);do
+	#first attempt at genbank page retrieval
+	name=$(basename -s .txt ${FILE})
+	gb1=${output}/${name}_1.gb
+	gb2=${output}/${name}_2.gb
+	missing=${output}/${name}_missing.lst
+	missing_2=${output}/${name}_missing_2.lst
+	missing_final=${output}/${name}_missing_final.lst
+	accessions=$(cat ${FILE})
+	url1="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${accessions}&rettype=gb&retmode=text" 
+	curl -N -L --retry 5 --retry-delay 2 ${url1} -o ${gb1}
+
+	#check that all accessions present if not write out to missing list
+	ON=0
+	ACC=""
+
+	while IFS= read -r line; do
+	    if [[ ${line} =~ ^LOCUS ]]; then
+	        if [[ ${ON} -eq 1 ]]; then
+	            echo ${ACC} >> ${missing}
+	        fi
+	        ON=1
+	        ACC=""
+	        continue
+	    fi
+
+	    if [[ ${line} =~ ^ACCESSION ]]; then
+	        ACC=$(echo ${line} | awk '{print $2}')
+	        continue
+	    fi
+
+	    if [[ ${line} =~ ^// ]]; then
+	        ON=0
+	        ACC=""
+	        continue
+	    fi
+	done < ${gb1}
+
+	if [[ ${ON} -eq 1 && -n ${ACC} ]]; then
+	    echo ${ACC} >> ${missing}
+	fi
+
+	###second attempt at genbank retrieval
+	if [[ -s ${missing} ]]; then
+	    awk 'NF' ${missing} >> ${missing_2}
+	    tr '\n' ',' < ${missing_2} | sed 's/,$/\n/' > ${missing_final}
+	    accessions=$(cat ${missing_final})
+	    url2="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${accessions}&rettype=gb&retmode=text" 
+	    curl -N -L --retry 5 --retry-delay 2 ${url2} -o ${gb2}
+	fi
+
+	###write out retrieved entries to final.gb file for file processed
+	cat ${gb1} >> ${gb_final}
+	if [[ -s ${gb2} ]]; then
+        cat ${gb2} >> ${gb_final}
+    fi
+
+	###clear files after
+	rm -f ${gb1} ${gb2} ${missing} ${missing_2} ${missing_final}
+done
+chmod -R a=rwx ${output}
+exit 0; </code></pre>
+<pre><code>chmod a=rwx scripts/11.genbank_fetch</code></pre>
+<pre><code>bash scripts/11.genbank_fetch</code></pre>
+
+<li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
+<pre><code>nano scripts/12.rsem</code></pre>
+<pre><code>#!/bin/env bash
+
+THR=5
+ON='module miniconda && conda activate rsem'
+eval $ON
+
+###input and output directories
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
+output=${workdir}'/results/12.rsem'
+reads=${workdir}'/data/fastq'
+assemblies=${workdir}'/results/05.megahit'
+
+###make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+
+function RUN_RSEM {
+  FOW=$1; reads_dir=$2; assembly_dir=$3; out_dir=$4; threads=$5
+
+  REV=`echo ${FOW} | sed -r 's,_(r|R)?1,_\12,'`
+  sample=`basename ${FOW} | cut -d '_' -f1`
+
+  contigs="${assembly_dir}/${sample}/${sample}.contigs.fasta"
+  out_prefix="${out_dir}/${sample}.RSEM"
+
+  if [[ ! -f ${contigs} ]]; then
+    echo "[WARN] Missing contigs for ${sample}: ${contigs}"
+    return
+  fi
+  if [[ ! -f ${FOW} || ! -f ${REV} ]]; then
+    echo "[WARN] Missing reads for ${sample}"
+    return
+  fi
+
+  echo "[INFO] Running RSEM for ${sample}"
+
+  ###Run RSEM using Trinity utility
+  align_and_estimate_abundance.pl \
+        --transcripts ${contigs} \
+        --seqType fq \
+        --left ${FOW} \
+        --right ${REV} \
+        --est_method RSEM \
+        --aln_method bowtie2 \
+        --output_dir ${out_prefix} \
+        --thread_count ${threads} \
+        --prep_reference \
+        > ${out_prefix}'.log' 2>&1
+
+  echo "[DONE] ${sample}"
+}
+export -f RUN_RSEM
+
+echo "[INFO] Starting RSEM quantification for samples..."
+###check and run in parallel
+PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
+if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
+ ls -dl ${reads}/*.gz | grep -Ei '_r?1' | parallel -j ${THR} -n1 -I% "RUN_RSEM %" ${reads} ${assemblies} ${output} 1
+else
+ for FILE in $(ls -dl ${reads}/*.gz | grep -Ei '_r?1'); do
+  RUN_RSEM ${FILE} ${reads} ${assemblies} ${output} 1
+ done
+fi
+
+OFF='conda deactivate'
+eval ${OFF}
+chmod -R a=rwx ${output}
+exit 0; </code></pre>
+<pre><code>chmod a=rwx scripts/12.rsem</code></pre>
+<pre><code>bash scripts/12.rsem</code></pre>
