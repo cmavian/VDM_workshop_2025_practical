@@ -88,61 +88,46 @@ We will use <i>nano</i> text editor to creat all scripts. You can create empty f
 <pre><code>nano scripts/<script_name>.sh</code></pre>
 <i>you can copy & paste the script text directly into the open document.</i><br>
 To save any of your scripts, press ctrl+X then Y and ENTER. This will "override" the <script_name>.sh (which was empty on opening)<br>
-You can change the name after pressing 'Y'.<br>
-Before running the script you have to change permissions <pre><code>chmod a=rwx scripts/<script_name>.sh</code></pre>
-To run the script type: <pre><code>bash scripts/<script_name>.sh</code></pre><br>
+You can change the name after pressing 'Y'.Before running the script you have to change permissions
+<pre><code>chmod a=rwx scripts/<script_name>.sh</code></pre>
+To run the script type:
+<pre><code>bash scripts/<script_name>.sh</code></pre><br>
 
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
-Let's create a script to execute this step in metagenomics/scripts directory
-<pre><code>cd /analyses/vdworkshop/${USER}</code></pre>
-or
-<pre><code>cd ~/workspace</code></code></pre>
-(<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics</code>)<br><br>
-
-We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
 <pre><code>nano scripts/01.fastqc_pretrim.sh</code></pre>
-<i>you can copy & paste the script text directly into the open document.</i><br>
-
 <pre><code>#!/bin/env bash
 
 THR=5
-### enabling conda environment and fastqc program
+###enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc"
 eval $ON
 
-### input and output directories
+###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/data/fastq'
 output=${workdir}'/results/01.fastqc_pretrim'
 
-### make output directory if it doesn't exist
+###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo 'Running FastQC pre-trim'
 
-### run fastqc
+###run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.f*q*
 echo "Pretrim FastQC complete"
 
-### deactivating fastqc program
+###deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 chmod -R a=rwx ${output}
 
 exit 0;
 </code></pre>
-
-To save your script press ctrl+X then Y and ENTER<br>
-This will "override" the 01.fastqc_pretrim.sh (which was empty on opening)<br>
-You can change the name after pressing Y <br><br>
-Before running the script you have to change permissions
 <pre><code>chmod a=rwx scripts/01.fastqc_pretrim.sh</code></pre>
-To run the script type:
 <pre><code>bash scripts/01.fastqc_pretrim.sh</code></pre>
 
 <h4><li>Trimmomatic</li></h4>
-Let's create another script for trimmomatic in the same directory<br>
 <pre><code>nano scripts/02.trimmomatic.sh</code></pre><br>
 
 <pre><code>#!/bin/env bash
