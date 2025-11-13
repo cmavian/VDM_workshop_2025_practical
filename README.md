@@ -85,13 +85,13 @@ In this section we will create scripts to execute each step. The scripts will be
 <pre><code>cd ~/workspace/metagenomics</code></code></pre>
 (<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics</code>)<br><br>
 We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
-<pre><code>nano scripts/<script_name>.sh</code></pre>
+<pre><code>nano scripts/[script_name].sh</code></pre>
 <i>you can copy & paste the script text directly into the open document.</i><br>
-To save any of your scripts, press ctrl+X then Y and ENTER. This will "override" the <script_name>.sh (which was empty on opening)<br>
+To save any of your scripts, press ctrl+X then Y and ENTER. This will "override" the [script_name].sh (which was empty on opening)<br>
 You can change the name after pressing 'Y'.Before running the script you have to change permissions
-<pre><code>chmod a=rwx scripts/<script_name>.sh</code></pre>
+<pre><code>chmod a=rwx scripts/[script_name].sh</code></pre>
 To run the script type:
-<pre><code>bash scripts/<script_name>.sh</code></pre><br>
+<pre><code>bash scripts/<[script_name].sh</code></pre><br>
 
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
@@ -99,25 +99,25 @@ To run the script type:
 <pre><code>#!/bin/env bash
 
 THR=5
-###enabling conda environment and fastqc program
+### enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc"
 eval $ON
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/data/fastq'
 output=${workdir}'/results/01.fastqc_pretrim'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo 'Running FastQC pre-trim'
 
-###run fastqc
+### run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.f*q*
 echo "Pretrim FastQC complete"
 
-###deactivating fastqc program
+### deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 chmod -R a=rwx ${output}
@@ -129,7 +129,6 @@ exit 0;
 
 <h4><li>Trimmomatic</li></h4>
 <pre><code>nano scripts/02.trimmomatic.sh</code></pre><br>
-
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -204,13 +203,10 @@ chmod -R a=rwx ${output}
 
 exit 0;
 </code></pre>
-
-Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx  scripts/03.fastqc_posttrim.sh</code></pre>
 <pre><code>bash  scripts/03.fastqc_posttrim.sh</code></pre>
 
 <h4><li>MultiQC</li></h4>
-Let's create a script for this step<br>
 <pre><code>nano  scripts/04.multiqc.sh</code></pre>
 
 <pre><code>#!/bin/env bash
