@@ -91,7 +91,7 @@ To save any of your scripts, press ctrl+X then Y and ENTER. This will "override"
 You can change the name after pressing 'Y'.Before running the script you have to change permissions
 <pre><code>chmod a=rwx scripts/[script_name].sh</code></pre>
 To run the script type:
-<pre><code>bash scripts/<[script_name].sh</code></pre><br>
+<pre><code>bash scripts/[script_name].sh</code></pre><br>
 
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
@@ -99,25 +99,25 @@ To run the script type:
 <pre><code>#!/bin/env bash
 
 THR=5
-### enabling conda environment and fastqc program
+###enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc"
 eval $ON
 
-### input and output directories
+###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/data/fastq'
 output=${workdir}'/results/01.fastqc_pretrim'
 
-### make output directory if it doesn't exist
+###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo 'Running FastQC pre-trim'
 
-### run fastqc
+'### run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.f*q*
 echo "Pretrim FastQC complete"
 
-### deactivating fastqc program
+'###deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 chmod -R a=rwx ${output}
@@ -132,7 +132,7 @@ exit 0;
 <pre><code>#!/bin/env bash
 
 THR=5
-### activating program
+###activating program
 ON='module trimmomatic 1>/dev/null 2>/dev/null'
 eval ${ON}
 
@@ -141,10 +141,10 @@ input=${workdir}'/data/fastq'
 output=${workdir}'/results/02.trim_output'
 ADAPTERS=${workdir}'/data/adapters.fa'
 
-### make output directory if it doesn't exist
+###make output directory if it doesn't exist
 if [[ ! -e ${output} ]]; then mkdir -p ${output}; fi
 
-### getting the SRA IDs and creating output files
+###getting the SRA IDs and creating output files
 for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
@@ -153,7 +153,7 @@ for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
   P2=${output}/${ID}'_2.P.fq.gz'
   U2=${output}/${ID}'_2.U.fq.gz'
 
-  ### running program
+  ###running program
   echo "trimming: ${ID}"
   trimmomatic PE -threads ${THR} -phred33 -summary ${output}/${ID}'_statsSummary.txt' \
     ${FOW} ${REV} ${P1} ${U1} ${P2} ${U2} \
@@ -165,37 +165,33 @@ done
 chmod -R a=rwx ${output}
 exit 0;
 </code></pre>
-
-Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx  scripts/02.trimmomatic.sh</code></pre>
 <pre><code>bash  scripts/02.trimmomatic.sh</code></pre>
 
 <h4><li>FastQC post-Trimmomatic</li></h4>
-Open new script:<br>
 <pre><code>nano scripts/03.fastqc_posttrim.sh</code></pre>
-
 <pre><code>#!/bin/env bash
 
 THR=5
-### enabling conda environment and fastqc program
+###enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc 1>/dev/null 2>/dev/null"
 eval $ON
 
-### input and output directories
+###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/03.fastqc_posttrim'
 
-### make output directory if it doesn't exist
+###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo 'Running FastQC post-trim'
 
-### run fastqc
+###run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.P.fq.gz
 echo "Post-trim FastQC complete"
 
-### deactivating fastqc program
+###deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 
@@ -208,31 +204,31 @@ exit 0;
 
 <h4><li>MultiQC</li></h4>
 <pre><code>nano  scripts/04.multiqc.sh</code></pre>
-
 <pre><code>#!/bin/env bash
 
 THR=5
-### enabling conda environment and fastqc program
+###enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc 1>/dev/null 2>/dev/null"
 eval $ON
 
-### input and output directories
+###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input_pre=${workdir}'/results/01.fastqc_pretrim'
 input_post=${workdir}'/results/03.fastqc_posttrim'
 output=${workdir}'/results/04.multiqc'
 
-### make output directory if it doesn't exist
+###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-### runnig multiqc
-### this will join both results, we would rather want to keep them separate to compare
+###runnig multiqc
+
+###to join both results
 #multiqc ${input_pre} ${input_post} -o ${output}
 
 multiqc ${input_pre} -o ${output}/multiqc_pretrim
 multiqc ${input_post} -o ${output}/multiqc_posttrim
 
-### deactivating multiqc program
+###deactivating multiqc program
 OFF='conda deactivate'
 eval ${OFF}
 
@@ -242,31 +238,27 @@ chmod -R a=rwx ${output}
 
 exit 0;
 </code></pre>
-
-Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx  scripts/04.multiqc.sh</code></pre>
 <pre><code>bash  scripts/04.multiqc.sh</code></pre>
 
 <h4><li>Megahit</li></h4>
-Create new script:<br>
 <pre><code>nano  scripts/05.megahit.sh</code></pre>
-
 <pre><code>#!/bin/env bash
 
 THR=5
-### enabling conda environment and megahit program
+###enabling conda environment and megahit program
 ON="module miniconda && conda activate megahit 1>/dev/null 2>/dev/null"
 eval $ON
 
-### input and output directories
+###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/05.megahit'
 
-### make output directory if it doesn't exist
+###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-### run megahit
+###run megahit
 for FOW in $(ls ${input}/*_1.P.fq.gz); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
@@ -275,15 +267,15 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   echo "assembling: ${ID}"
   megahit -t ${THR} -1 ${FOW} -2 ${REV} -o ${output}/${ID} 1>${LOG} 2>${LOG}
 
-  ### after megahit run, prepend sample name to contigs
-  ### (allows easier tracking of which contigs came from which sample in downstream analysis)
+  ###after megahit run, prepend sample name to contigs
+  ###(allows easier tracking of which contigs came from which sample in downstream analysis)
   awk -v prefix="${ID}_" '/^>/ {$0=">" prefix substr($0,2)} {print}
     ' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
 
   echo "Megahit assmebly completed successfully and contigs named with sample name: ${ID}"
 done
 
-### deactivating megahit program
+###deactivating megahit program
 OFF='conda deactivate'
 eval ${OFF}
 
@@ -291,8 +283,6 @@ chmod -R a=rwx ${output}
 
 exit 0;
 </code></pre>
-
-Save your script, change permissions and run the script.<br>
 <pre><code>chmod a=rwx  scripts/05.megahit.sh</code></pre>
 <pre><code>bash  scripts/05.megahit.sh</code></pre>
 
