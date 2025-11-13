@@ -111,19 +111,18 @@ output=${workdir}'/results/01.fastqc_pretrim'
 ###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-echo 'Running FastQC pre-trim'
+echo '[INFO] Running FastQC pre-trim'
 
-'### run fastqc
+###run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.f*q*
-echo "Pretrim FastQC complete"
+echo '[DONE] Pretrim FastQC complete"
 
-'###deactivating fastqc program
+###deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
-chmod -R a=rwx ${output}
 
-exit 0;
-</code></pre>
+chmod -R a=rwx ${output}
+exit 0; </code></pre>
 <pre><code>chmod a=rwx scripts/01.fastqc_pretrim.sh</code></pre>
 <pre><code>bash scripts/01.fastqc_pretrim.sh</code></pre>
 
@@ -154,19 +153,18 @@ for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
   U2=${output}/${ID}'_2.U.fq.gz'
 
   ###running program
-  echo "trimming: ${ID}"
+  echo "[INFO] trimming: ${ID}"
   trimmomatic PE -threads ${THR} -phred33 -summary ${output}/${ID}'_statsSummary.txt' \
     ${FOW} ${REV} ${P1} ${U1} ${P2} ${U2} \
     ILLUMINACLIP:"${ADAPTERS}":2:30:10 LEADING:5 TRAILING:5 SLIDINGWINDOW:4:5 MINLEN:25 \
     2>>${output}/${ID}.log 1>>${output}/${ID}.log
 
-  echo "Trimming for ${ID} complete"
+  echo "[DONE] Trimming for ${ID} complete"
 done
 chmod -R a=rwx ${output}
-exit 0;
-</code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx  scripts/02.trimmomatic.sh</code></pre>
-<pre><code>bash  scripts/02.trimmomatic.sh</code></pre>
+<pre><code>bash scripts/02.trimmomatic.sh</code></pre>
 
 <h4><li>FastQC post-Trimmomatic</li></h4>
 <pre><code>nano scripts/03.fastqc_posttrim.sh</code></pre>
@@ -185,20 +183,18 @@ output=${workdir}'/results/03.fastqc_posttrim'
 ###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-echo 'Running FastQC post-trim'
+echo '[INFO] Running FastQC post-trim'
 
 ###run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.P.fq.gz
-echo "Post-trim FastQC complete"
+echo '[DONE] Post-trim FastQC complete'
 
 ###deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 
 chmod -R a=rwx ${output}
-
-exit 0;
-</code></pre>
+exit 0; </code></pre>
 <pre><code>chmod a=rwx  scripts/03.fastqc_posttrim.sh</code></pre>
 <pre><code>bash  scripts/03.fastqc_posttrim.sh</code></pre>
 
@@ -220,8 +216,7 @@ output=${workdir}'/results/04.multiqc'
 ###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-###runnig multiqc
-
+echo '[INFO] Runnig multiqc'
 ###to join both results
 #multiqc ${input_pre} ${input_post} -o ${output}
 
@@ -234,10 +229,9 @@ eval ${OFF}
 
 zip -9r ${output}/multiqc_pretrim.zip ${output}/multiqc_pretrim
 zip -9r ${output}/multiqc_posttrim.zip ${output}/multiqc_posttrim
-chmod -R a=rwx ${output}
 
-exit 0;
-</code></pre>
+chmod -R a=rwx ${output}
+exit 0; </code></pre>
 <pre><code>chmod a=rwx  scripts/04.multiqc.sh</code></pre>
 <pre><code>bash  scripts/04.multiqc.sh</code></pre>
 
@@ -264,7 +258,7 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   ID=`basename ${FOW} | cut -d '_' -f1`
   LOG=${output}/${ID}.log
 
-  echo "assembling: ${ID}"
+  echo "[INFO] assembling: ${ID}"
   megahit -t ${THR} -1 ${FOW} -2 ${REV} -o ${output}/${ID} 1>${LOG} 2>${LOG}
 
   ###after megahit run, prepend sample name to contigs
@@ -272,7 +266,7 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   awk -v prefix="${ID}_" '/^>/ {$0=">" prefix substr($0,2)} {print}
     ' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
 
-  echo "Megahit assmebly completed successfully and contigs named with sample name: ${ID}"
+  echo "[DONE] Megahit assmebly completed successfully and contigs named with sample name: ${ID}"
 done
 
 ###deactivating megahit program
@@ -280,15 +274,13 @@ OFF='conda deactivate'
 eval ${OFF}
 
 chmod -R a=rwx ${output}
-
-exit 0;
-</code></pre>
+exit 0; </code></pre>
 <pre><code>chmod a=rwx  scripts/05.megahit.sh</code></pre>
 <pre><code>bash  scripts/05.megahit.sh</code></pre>
 
 <h4><li>Diamond</li></h4>
 <ol start=i>
-<li>Create new script:</li><br>
+<li>Filtering viral sequences from RVDB protein database</li>
 <pre><code>nano scripts/06.1.diamond_rvdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -301,15 +293,18 @@ eval $ON
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/05.megahit'
 output=${workdir}'/results/06.1.diamond_rvdb'
+input_db=${workdir}'/data/database'
 
 ### DB variables and directories
-FASTA="${workdir}/data/database/U-RVDBv30.0-prot.fasta"
+FASTA="${input_db}/U-RVDBv30.0-prot.fasta"
 DB='RVDB'
+if [[ ! -e ${FASTA} && -e ${FASTA}.xz ]]; then xz -dk -T ${THR} ${FASTA}.xz; fi
 
 ### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
+echo '[INFO] Reading database file '{$DB}
 if [[ ! -e ${output}/${DB}.dmnd ]]; then
   diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
 chmod a=rwx ${output}/${DB}.dmnd
@@ -317,12 +312,13 @@ chmod a=rwx ${output}/${DB}.dmnd
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
 function DBLX {
- FOLDER=$1; OUT=$2; DB=$3; T=$;
+ FOLDER=$1; OUT=$2; DB=$3; T=$4;
   ID=$(basename $1)
   CONTIGS=${FOLDER}/${ID}.contigs.fasta
   LOG=${OUT}/${ID}.log
 
   if [[ -f ${CONTIGS} ]]; then
+	echo "[INFO] Analyzing sample ${ID}"
     sample_out=${OUT}/${ID}_rvdb.blastx
     diamond blastx -d ${OUT}/${DB}.dmnd \
     -q ${CONTIGS} \
@@ -335,13 +331,12 @@ function DBLX {
     --unal 0 \
     --mp-init 1>${LOG} 2>${LOG}
   else
-    echo "Contigs file for ${ID} not found."
+    echo "[WARNING] Contigs file for ${ID} not found."
   fi
-
-
 }
 export -f DBLX
 
+### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
  ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1
@@ -352,57 +347,12 @@ else
 fi
 
 chmod -R a=rwx ${output}
-
-exit 0;
-</code></pre>
-
-Save your script, change permissions and run the script.<br>
+exit 0; </code></pre>
 <pre><code>chmod a=rwx scripts/06.1.diamond_rvdb.sh</code></pre>
 <pre><code>bash scripts/06.1.diamond_rvdb.sh</code></pre>
 
-<li>Filtering viral sequencess from NCBI database</li><br>
-Create a script for NCBI database:<br>
-<pre><code>nano 06.2.ncbidb.sh</code></pre>
-
-<pre><code>#!/bin/env bash
-
-### input and output directories
-workdir=`realpath $(pwd) 2>/dev/null`
-input=${workdir}'/data/ncbi'
-output=${workdir}'/results/06.2.ncbidb'
-
-### variables and directories
-input_db=${input}'/nr.faa'
-viral_csv=${input}'/virus_taxonomy_lvls.csv'
-viral_names=${input}'/viral_names.txt"
-DBFASTA=${output}'/ncbi_fasta.fasta'
-
-### make output directory if it doesn't exist
-if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
-
-### filter csv for viral sequences
-awk -F',' '{print $3}' ${viral_csv} >> ${viral_names}
-
-### filter nr database for viral sequences 
-while read -r virus; do
-    awk -v name="${virus}" '
-        BEGIN {IGNORECASE=1}
-        /^>/ {ON = index($0, name) > 0}
-        ON {print}
-    ' ${input_db} >> ${DBFASTA}
-done < ${viral_names}
-
-chmod -R a=rwx ${output}
-
-exit 0;
-</code></pre>
-
-Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx scripts/06.2.ncbidb.sh</code></pre>
-<pre><code>bash scripts/06.2.ncbidb.sh</code></pre>
-
-<li>Create another script for diamond using NCBI database:</li><br>
-<pre><code>nano scripts/06.3.diamond_ncbi.sh</code></pre>
+<li>Filtering viral sequences from NCBI protein database</li><br>
+<pre><code>nano 06.2.diamond_nrdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -413,398 +363,189 @@ eval $ON
 
 ### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
-input_db=${workdir}'/results/06.2.ncbidb'
-output=${workdir}'/results/06.3.diamond_ncbi'
-DBFASTA=${input_db}'/ncbi_fasta.fasta'
-DB='NCBI'
-input_reads=${workdir}'/results/05.megahit'
+input=${workdir}'/results/05.megahit'
+output=${workdir}'/results/06.1.diamond_nrdb'
+input_db=${workdir}'/data/database'
+
+### DB variables and directories
+FASTA="${input_db}/nr.faa"
+DB='NRDB'
+if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
 
 ### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
+echo '[INFO] Reading database file '{$DB}
 if [[ ! -e ${output}/${DB}.dmnd ]]; then
-  diamond makedb --in ${DBFASTA} --threads ${THR} -d ${output}/${DB}; fi
+  diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
 chmod a=rwx ${output}/${DB}.dmnd
 
-### loop through each of the files created in megahit output directory 
+### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
-for FOLDER in $(ls -dl ${input_reads}/* | grep ^d | awk '{print $9}'); do
-  ID=$(basename ${FOLDER})
+function DBLX {
+ FOLDER=$1; OUT=$2; DB=$3; T=$4;
+  ID=$(basename $1)
   CONTIGS=${FOLDER}/${ID}.contigs.fasta
+  LOG=${OUT}/${ID}.log
 
-  ### alignment using blastx
-  ### (exclude --min-score because it overrides the evalue (acc. to manual))
   if [[ -f ${CONTIGS} ]]; then
-    sample_out=${output}/${ID}_ncbi.matches.m8
-    diamond blastx -d ${output}/${DB}.dmnd \
+	echo "[INFO] Analyzing sample ${ID}"
+    sample_out=${OUT}/${ID}_nrdb.blastx
+    diamond blastx -d ${OUT}/${DB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
-    --threads ${THR} \
+    --threads ${T} \
     --evalue 1e-5 \
     --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
     --id 80 \
     --strand both \
     --unal 0 \
-    --mp-init
+    --mp-init 1>${LOG} 2>${LOG}
   else
-    echo "Contigs file for ${ID} not found."
+    echo "[WARNING] Contigs file for ${ID} not found."
   fi
-done
+}
+export -f DBLX
 
-### deactivating diamond program
-OFF='conda deactivate'
-eval ${OFF}
+### check and run in parallel
+PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
+if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
+ ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1
+else
+ for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
+  DBLX ${FOLDER} ${output} ${DB} 1
+ done
+fi
 
 chmod -R a=rwx ${output}
-
-exit 0;
-</code></pre>
-
-Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx scripts/06.3.diamond_ncbi.sh</code></pre>
-<pre><code>bash scripts/06.3.diamond_ncbi.sh</code></pre>
+exit 0; </code></pre>
+<pre><code>chmod a=rwx scripts/06.2.diamond_nrdb</code></pre>
+<pre><code>bash scripts/06.2.diamond_nrdb</code></pre>
 </ol>
 
-<h4><li>Taxonomy</li></h4>
-Create new script:<br>
-<pre><code>nano scripts/07.taxonomy.sh</code></pre>
-
-<pre><code>#!/bin/env bash
-
-### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`
-input=${workdir}'/results/06.3.diamond_ncbi' ####(???)
-input_ids=${workdir}/data/acc_ids.txt' ########(???)
-output=${workdir}'/results/07.' ###############(???)
-output_tsv=${output}'/07.taxonomy.tsv'
-
-### make output directory if it doesn't exist
-if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
-
-### function to get metadata from eutils
-function get_meta {
-    contig=$1
-    length=$2
-    acc_id=$3
-    #columns=$4 ###########(???)
-    #output=$5
-	output=$4
-
-    ### print ncbi page of protein accession and parse taxonomic id for use in taxonkit for lineage
-	  b1='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db='
-	  db='protein'
-	  b2='&id='
-	  b3='&rettype='
-	  file_type='gb'
-	  b4='&retmode='
-	  file_mode='text'
-	url="${b1}${db}${b2}${acc_id}${b3}${file_type}${b4}${file_mode}"
-    info=$(curl -L --retry 3 --connect-timeout 5 -N -# ${url})
-   
-	### taxonomic number
-    tax=$(echo "${info}" | awk '/\/db_xref/ { match($0, /taxon:([0-9]+)/, tax_id); print tax_id[1] }')
-
-    ### put NA if no taxonomy id found
-    if [[ -z "${tax}" ]]; then tax="NA"; fi;
-
-    ### print output
-    echo -e "${contig}\t${length}\t${acc_id}\t${rest}\t${tax}" >>"${output}"
-    sleep 1s
-}
-export -f get_meta
-
-### clear output file before each run
-rm -f ${output_tsv}
-
-### adding empty line if there is none, else the file will be read incorrectly:
-if ! [[ `tail -n1 ${input_ids}` =~ ^$ ]]; then echo >> ${input_ids}; fi
-
-while read -r LN; do
-  ### skipping over empyt lines in file
-  if [[ `echo ${LN}` =~ ^$ ]]; then ontinue; fi
-
-  ### splitting columns into fixed positions in a list
-  unset TMP; declare -a TMP=(${LN})
-  echo '['${TMP[2]}']'
-
-  ### creating temporary file
-  tmpfile=$(mktemp)
-
-  ### passing arguments to function (list index starts from possition 0)
-  get_meta ${TMP[0]} ${TMP[1]} ${TMP[2]} ${tmpfile}
-
-  ### collecting results
-  cat ${tmpfile} >>${output_tsv}
-  rm -f ${tmpfile}
-done <"${input_ids}"
-
-chmod -R a=rwx ${output}
-
-exit 0;
-</code></pre>
-
-Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx scripts/07.taxonomy.sh</code></pre>
-<pre><code>bash scripts/07.taxonomy.sh</code></pre>
-
-<h4><li>Lineage filter</li></h4>
-Create new script:<br>
-<pre><code>nano 08.lineage_filter.sh</code></pre>
+<li>Combining results from both blastx seqrches</li><br>
+<pre><code>nano scripts/07.combine.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
 THR=5
-### enabling conda environment and viral_pipeline program
-ON="module miniconda && conda activate viral_pipeline" ##############(???)
-eval ${ON}
-
 ### input and output directories
-workdir=`realpath $(pwd) 2>/devnull`'/../'
-input=${workdir}'/results/07.taxonomy'
-output=${workdir}'/results/08.lineage_filter'
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/05.megahit'
+output=${workdir}'/results/07.combine'
+rvdb_in=${workdir}'/results/06.1.diamond_rvdb'
+nrdb_in=${workdir}'/results/06.2.diamond_nrdb'
+contigs_in=${workdir}'/results/05.megahit'
 
-acc_tax_id="${output}/acc_tax_id.tsv"
-u_match_out="${output}/unique_contig_ids.txt"
-lineage_out="${output}/lineages.tsv"
-contig_matches="${output}/contig_matches.tsv"
-output_fa="${output}/blast_fasta.fa"
-#mega_conts="${workdir}/results/05.megahit/output/default" (####### ???)
+combined_dir="${workdir}/results/07.combined"
+### make output directory if it doesn't exist
+if ! [[ -d ${combined_dir} ]]; then mkdir -p -m a=rwx ${combined_dir}; fi
 
-for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
-  ID=$(basename ${FOLDER})
-  CONTIGS=${FOLDER}/${ID}.contigs.fasta
+rvdb_out=${combined_dir}'/combined_rvdb.blastx'
+nrdb_out=${combined_dir}'/combined_nr.blastx'
+rvdb_virus=${combined_dir}'/combined_rvdb.virus_hits.blastx'
+nrdb_virus=${combined_dir}'/combined_nrdb.virus_hits.blastx'
+unique=${combined_dir}'/unique_viral_contigs.txt'
+combined_contigs=${combined_dir}'/all_contigs.fasta'
+viral_fasta=${combined_dir}'/viral_contigs.fasta'
 
-  #fin_fasta=${mega_conts}/*/sample.contigs.fa
+echo "[INFO] Concatenating all contigs..."
+cat ${contigs_in}/*.contigs.fasta > ${combined_contigs}
 
+echo "[INFO] Concatenating RVDB blastx results..."
+cat ${rvdb_in}/*_rvdb.blastx > ${rvdb_out}
 
-  ### clear lineage output files
-  if [[ -e ${lineage_out}    ]]; then rm -f ${lineage_out};    touch ${lineage_out};    fi
-  if [[ -e ${contig_matches} ]]; then rm -f ${contig_matches}; touch ${contig_matches}; fi
-  if [[ -e ${u_match_out}    ]]; then rm -f ${u_match_out};    touch ${u_match_out};    fi
-  if [[ -e ${output_fa}      ]]; then rm -f ${output_fa};      touch ${output_fa};      fi
+echo "[INFO] Concatenating VP blastx results..."
+cat ${nrdb_in}/*_nrdb.blastx > ${nrdb_out}
 
-  ### get raw lineage information
-  echo "Retrieving lineage information"
-  taxonkit lineage -d $'\t' -i 9 ${acc_tax_id} > ${lineage_out}
+echo "[INFO] Filtering for viral hits..."
 
-  ### extract contig matches that are part of viruses
-  echo "Extracting contig matches that are part of viruses"
-  for LN in $(cat ${lineage_out}); do
-    if [[ `echo ${LN}` =~ ^$ ]]; then continue; fi
-	if [[ `echo ${LN} | grep -i 'Viruses'` ]]; then echo -e "${LN}\n" >>${contig_matches}; fi
-  done
-#  while read -r -a fields; do
-#    if [[ ${fields[9]} == *Viruses* ]]; then
-#        echo "${fields[2]}"
-#        printf "%s\t" "${fields[@]}" "\n" >> ${contig_matches}
-#        printf "\n" >> ${contig_matches}
-#    fi
-# done < ${lineage_out}
+grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
+grep -Ei "vir[us|idae|oid]" ${nrdb_out} > ${nrdb_virus}
 
-  ### get unique contig matches
-  echo "Extract unique contig matches"
-  cat ${contig_matches} | awk '{print $1}' > ${u_match_out}
-  sort -u ${u_match_out} -o ${u_match_out}
+#grep -Ei "virus|viridae|viroid" ${rvdb_out} > ${rvdb_virus}
+#grep -Ei "virus|viridae|viroid" ${nrdb_out} > ${nrdb_virus}
 
-  ### find the contig matches in the final.contigs.fa file
-  echo "Producing final blasta fasta with matches to blast against NT and NR"
-  
-  while read -r hit; do
-    if grep -qF ">${hit}" "${CONTIGS}"; then
-        awk -v contig=">${hit}" '
-            $0 ~ ("^"contig) {print; ON=1; next}
-            ON && /^>/ {exit}
-            ON {print}
-        ' ${CONTIGS} >> ${output_fa}
-    fi
+echo "[INFO] Extracting unique contig names..."
+awk '{print $1}' ${rvdb_virus} ${nrdb_virus} | sort -u > ${unique}
 
-    #progress check
-    echo "Sequence for ${hit} found"
-  done < "${u_match_out}"
-done
-
-exit 0
-</code></pre>
-
-Save your script, change permissions and run the script.<br>
-<pre><code>chmod a=rwx 08.lineage_filter.sh</code></pre>
-<pre><code>bash 08.lineage_filter.sh</code></pre>
-
-
-##########################################################################
-### 9. BlastN
-
-```
-cd metagenomics/scripts
-nano 09.blastn.sh
-```
-
-```
-#!/bin/env bash
-
-#load modules
-module ncbi
-ON="module miniconda && conda activate viral_pipeline"
-
-#directories
-wdir="/analyses/users/nokuzothan/disc_pipe"
-db_fa="${wdir}/ncbidb/nt/nt"
-input_fa="/analyses/users/nokuzothan/Virolocate/work/c4/03b0a4833978dcf7aabea1ab5a3987/final_blast_contig.fasta"
-blastn_out="${wdir}/init_tools/play"
-output="${blastn_out}/blastn_output_3.tsv"
-blastn_tax_tmp_1="${blastn_out}/contig_acc.txt"
-blastn_tax_tmp_2="${blastn_out}/contig_acc_tax.txt"
-blastn_tax="${blastn_out}/blastn_taxonomy.tsv"
-threads=4
-
-# #make blastn_results subdirectory in blastn output folder
-# if [[ -e ${blastn_out} ]]; then
-#     rm -rf ${blastn_out}
-# fi
-# mkdir -p -m a=rwx ${blastn_out}
-
-#blastn run
-if [[ -s ${input_fa} ]]; then
-    echo "Running blastn"
-    blastn -query ${input_fa} \
-        -db ${db_fa} \
-        -out ${output}\
-        -strand both \
-        -num_threads ${threads} \
-        -evalue 1E-5 \
-        -outfmt "6 qseqid qlen sseqid stitle pident length qstart qend evalue bitscore" \
-        -perc_identity 80 \
-        -max_target_seqs 5
-
-else
-    echo "Query fasta file of samples does not exist or is empty, skipping blastn."
-fi
-
-
-#extract contigs ids and accession numbers from blastn_output.tsv
-
-#get taxonomic ids
-function get_meta {
-    contig=$1
-    length=$2
-    acc_id=$3
-    columns=$4
-    output=$5
-
-    #progress check
-    echo "Fetching metadata for "${acc_id}""
-    #print ncbi page of protein accession and parse taxonomic id for use in taxonkit for lineage
-    url1="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${acc_id}&rettype=gb&retmode=text"
-    info=$(curl -N -# ${url1})
-
-    #host source, gographical location name, collection date, gene, product, taxonomic number
-    host=$(echo "${info}" | awk -F'"' '/\/host/ {print $2}')
-    geo_loc_name=$(echo "${info}" | awk -F'"' '/\/geo_loc_name/ {print $2}')
-    date=$(echo "${info}" | awk -F'"' '/\/collection_date/ {print $2}')
-    gene=$(echo "${info}" | awk -F'"' '/\/coded_by/ {print $2}')
-    product=$(echo "${info}" | awk -F'"' '/\\/product/ {print $2}')
-    tax=$(echo "${info}" | awk '/\/db_xref/ { match($0, /taxon:([0-9]+)/, tax_id); print tax_id[1] }')
-
-    #put NA if any of the fields are empty
-    if [[ -z "${host}" ]]; then
-        host="NA"
-    fi
-
-    if [[ -z "${geo_loc_name}" ]]; then
-        geo_loc_name="NA"
-    fi
-
-    if [[ -z "${date}" ]]; then
-        date="NA"
-    fi
-
-    if [[ -z "${gene}" ]]; then
-        gene="NA"
-    fi
-
-    if [[ -z "${product}" ]]; then
-        product="NA"
-    fi
-
-    if [[ -z "${tax}" ]]; then
-        tax="NA"
-    fi
-
-    #print output
-    echo -e "${contig}\t${length}\t${acc_id}\t${rest}\t${host}\t${gene}\t${product}\t${geo_loc_name}\t${date}\t${tax}" >>${output}
-}
-
-while IFS=$'\t' read -r col1 col2 col3 rest;do
-    acc=$(echo "[\${col3}]" | cut -d '|' -f2)
-    get_meta "${col1}" "${col2}" "${acc}" "${rest}" "blastn_metadata.tsv"
-done < "${output}"
-
-#get lineage information
+# Activate seqkit environment
+ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval ${ON}
 
-#progress check
-echo "Getting taxonomic lineage information"
+echo "[INFO] Extracting viral contigs using seqkit..."
+seqkit grep -f ${unique} ${combined_contigs} > ${viral_fasta}
 
-taxonkit lineage -d $'\t' -i 10 ${blastn_tax_tmp_2} >> ${blastn_tax}
-conda deactivate
+OFF='conda deactivate'
+eval ${OFF}
 
-#remove temp file
-rm ${blastn_tax_tmp_1}
-rm ${blastn_tax_tmp_2}
+echo -en "
+[DONE]
+ Combined RVDB blastx:      ${rvdb_out}
+ Combined VP blastx:        ${vp_out}
+ RVDB viral hits:           ${rvdb_virus}
+ VP viral hits:             ${vp_virus}
+ Unique viral contigs list: ${unique}
+ Viral contigs FASTA:       ${viral_fasta}
+"
 
-```
+echo "[COUNT] Number of viral contigs extracted:"
+grep -Ec "^>" ${viral_fasta}
 
-### 10. BlastX
+exit 0; </code></pre>
+<pre><code>chmod a=rwx scripts/07.combine.sh</code></pre>
+<pre><code>bash scripts/07.combine.sh</code></pre>
 
-```
-cd metagenomics/scripts
-nano 10.blastx.sh
-```
+<li>Filtering viral sequences from NCBI nucleotide database</li><br>
+<pre><code>nano scripts/08.ncbi_ntdb.sh</code></pre>
+<pre><code>#!/bin/env bash
+THR=5
+###### enabling BLAST program
+ON='module ncbi'
+eval ${ON}
 
-```
-#!/bin/env bash
+###input and output directories
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/07.combined/viral_contigs.fasta'
+output=${workdir}'/results/07.combine/08.ncbi_ntdb'
+input_db=${workdir}'/data/database'
 
-#load module
-module diamond
+###DB variables and directories
+FASTA="${input_db}/nt.fasta"
+DB='NTDB'
+if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
 
-# variables and directories
-wdir="/analyses/users/nokuzothan/disc_pipe"
-input_reads_dir="${wdir}/init_tools/diamond/output/blastn.fasta"
-db="${wdir}/ncbidb/fasta/nr.faa"
-output="${wdir}/init_tools/blastx_nr/output"
-threads=$((`/bin/nproc` -2))
+###make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-#clear existing output directory if any, make new output directory 
-if [[ -e $output ]]; then
-  rm -rf ${output} 
-fi
-mkdir -p ${output}
+echo -en "
+Running BLASTN against nt database...
+Query: ${input}
+DB:    ${DB}
+"
 
-#clear existing output file
-out_file="${output}/blastx_output.tsv"
-> ${out_file}
+blastn \
+    -db ${DB} \
+    -query ${input} \
+    -out ${output}'/viral_contigs_vs_nt.blastn' \
+    -num_threads ${THR} \
+    -evalue 1e-10 \
+    -max_target_seqs 25 \
+    -outfmt "6 qseqid qlen sseqid stitle pident length mismatch gapopen qstart qend sstart send evalue bitscore" \
+    > ${output}/blastn.log 2>&1
+
+chmod -R a+rwx ${output}
+
+echo -en "
+BLASTN complete.
+Results written to: ${output}/viral_contigs_vs_nt.blastn
+Log:                ${output}/blastn.log
+"
+exit 0; </code></pre>
+<pre><code>chmod a=rwx scripts/08.ncbi_ntdb.sh</code></pre>
+<pre><code>bash scripts/08.ncbi_ntdb.sh</code></pre>
 
 
-#make diamond protein database
-diamond makedb --in ${db} -d ${output}/nr
 
-#loop through each of the files created in megahit output directory to find final.congtigs.fa files and run diamond
-if [[ -s ${input_reads_dir} ]]; then
-  diamond blastx -d ${output}/nr.dmnd \
-    -q ${input_reads_dir} \
-    --out ${out_file} \
-    --threads ${threads} \
-    --evalue 1E-5 \
-    --outfmt 6 \
-    --id 80 \
-    --strand both \
-    --unal 0 \
-    --mp-init 
 
-else 
-  echo "Contigs file for samples not found or is empty."
-fi
-
-exit 0
-```
