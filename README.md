@@ -491,12 +491,12 @@ eval ${OFF}
 
 echo -en "
 [DONE]
- Combined RVDB blastx:      ${rvdb_out}
- Combined VP blastx:        ${vp_out}
- RVDB viral hits:           ${rvdb_virus}
- VP viral hits:             ${vp_virus}
- Unique viral contigs list: ${unique}
- Viral contigs FASTA:       ${viral_fasta}
+Combined RVDB blastx:      ${rvdb_out}
+Combined VP blastx:        ${vp_out}
+RVDB viral hits:           ${rvdb_virus}
+VP viral hits:             ${vp_virus}
+Unique viral contigs list: ${unique}
+Viral contigs FASTA:       ${viral_fasta}
 "
 
 echo "[COUNT] Number of viral contigs extracted:"
@@ -533,8 +533,8 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 echo -en "
 Running BLASTN against nt database...
 Query: ${input}
-DB:    ${DB}
-"
+DB:    ${DB}"
+
 blastn \
     -db ${DB} \
     -query ${input} \
