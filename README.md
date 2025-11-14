@@ -494,7 +494,7 @@ echo -en "
 Combined RVDB blastx:      ${rvdb_out}
 Combined VP blastx:        ${vp_out}
 RVDB viral hits:           ${rvdb_virus}
-VP viral hits:             ${vp_virus}
+NRDB viral hits:           ${nrdb_virus}
 Unique viral contigs list: ${unique}
 Viral contigs FASTA:       ${viral_fasta}
 "
