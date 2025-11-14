@@ -116,14 +116,14 @@ echo '[INFO] Running FastQC pre-trim'
 
 ###run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.f*q*
-echo '[DONE] Pretrim FastQC complete"
+echo -e "\n[DONE] Pretrim FastQC complete"
 
 ###deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/01.fastqc_pretrim.sh</code></pre>
 <pre><code>bash scripts/01.fastqc_pretrim.sh</code></pre>
 
@@ -190,14 +190,14 @@ echo '[INFO] Running FastQC post-trim'
 
 ###run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.P.fq.gz
-echo '[DONE] Post-trim FastQC complete'
+echo -e "\n[DONE] Post-trim FastQC complete\n"
 
 ###deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx  scripts/03.fastqc_posttrim.sh</code></pre>
 <pre><code>bash  scripts/03.fastqc_posttrim.sh</code></pre>
 
@@ -224,18 +224,19 @@ echo '[INFO] Runnig multiqc'
 ###to join both results
 #multiqc ${input_pre} ${input_post} -o ${output}
 
-multiqc ${input_pre} -o ${output}/multiqc_pretrim
+multiqc ${input_pre}  -o ${output}/multiqc_pretrim
 multiqc ${input_post} -o ${output}/multiqc_posttrim
 
 ###deactivating multiqc program
 OFF='conda deactivate'
 eval ${OFF}
 
+echo -e "\n[INFO] Compressing the results\n"
 zip -9r ${output}/multiqc_pretrim.zip ${output}/multiqc_pretrim
 zip -9r ${output}/multiqc_posttrim.zip ${output}/multiqc_posttrim
 
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx  scripts/04.multiqc.sh</code></pre>
 <pre><code>bash  scripts/04.multiqc.sh</code></pre>
 
@@ -279,7 +280,7 @@ OFF='conda deactivate'
 eval ${OFF}
 
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx  scripts/05.megahit.sh</code></pre>
 
 <pre><code>bash  scripts/05.megahit.sh</code></pre>
@@ -353,7 +354,7 @@ else
 fi
 
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/06.1.diamond_rvdb.sh</code></pre>
 <pre><code>bash scripts/06.1.diamond_rvdb.sh</code></pre>
 
@@ -425,7 +426,7 @@ else
 fi
 
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/06.2.diamond_nrdb</code></pre>
 <pre><code>bash scripts/06.2.diamond_nrdb</code></pre>
 </ol>
@@ -500,7 +501,7 @@ echo -en "
 echo "[COUNT] Number of viral contigs extracted:"
 grep -Ec "^>" ${viral_fasta}
 
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/07.combine.sh</code></pre>
 <pre><code>bash scripts/07.combine.sh</code></pre>
 
@@ -550,7 +551,7 @@ BLASTN complete.
 Results written to: ${output}/viral_contigs_vs_nt.blastn
 Log:                ${output}/blastn.log
 "
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/08.ncbi_ntdb.sh</code></pre>
 
 <pre><code>bash scripts/08.ncbi_ntdb.sh</code></pre>
@@ -602,7 +603,7 @@ Unique contig list:        ${unique_ids}
 Viral contigs FASTA:       ${viral_fasta}
 Output directory:          ${output}
 "
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/09.blastn_filtered</code></pre>
 <pre><code>bash scripts/09.blastn_filtered</code></pre>
 
@@ -658,7 +659,7 @@ echo -en "
 DIAMOND results: ${output}/viral_contigs_NR.blastx
 Log:             ${output}/diamond.log
 "
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/10.diamond_blastx_blastn_contigs</code></pre>
 <pre><code>bash scripts/10.diamond_blastx_blastn_contigs</code></pre>
 
@@ -739,7 +740,7 @@ for FILE in $(ls ${input}/*);do
 	rm -f ${gb1} ${gb2} ${missing} ${missing_2} ${missing_final}
 done
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/11.genbank_fetch</code></pre>
 <pre><code>bash scripts/11.genbank_fetch</code></pre>
 
@@ -813,6 +814,6 @@ fi
 OFF='conda deactivate'
 eval ${OFF}
 chmod -R a=rwx ${output}
-exit 0; </code></pre>
+exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/12.rsem</code></pre>
 <pre><code>bash scripts/12.rsem</code></pre>
