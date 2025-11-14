@@ -519,7 +519,7 @@ eval ${ON}
 ###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/07.combined/viral_contigs.fasta'
-output=${workdir}'/results/07.combine/08.ncbi_ntdb'
+output=${workdir}'/results/08.ncbi_ntdb'
 input_db=${workdir}'/data/database'
 
 ###DB variables and directories
