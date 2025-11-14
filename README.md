@@ -697,7 +697,7 @@ my \$output_dir = \$ARGV[1] or die \"Specify output directory\\n\";
 open(my \$in, \"<\", \$input_file) or die \"Cannot open \$input_file: \$!\\n\";
 
 my \$csv = Text::CSV->new({ binary => 1, eol => \"\\n\" });
-open(my \$out, ">$output_dir/taxonomy_lineage.csv\") or die \"Cannot write to output file: \$!\\n\";
+open(my \$out, \">\$output_dir/taxonomy_lineage.csv\") or die \"Cannot write to output file: \$!\\n\";
 \$csv->print(\$out, [\"Accession\", \"Organism\", \"TaxID\", \"Lineage\"]);
 
 while (my \$acc = <\$in>) {
@@ -743,8 +743,8 @@ while (my \$acc = <\$in>) {
   my \$taxon = \$tax_xml->{Taxon};
   \$taxon = \$taxon->[0] if ref(\$taxon) eq 'ARRAY';
 
-  my \$scientific_name = \$taxon->{ScientificName} || "N/A";
-  my \$lineage         = \$taxon->{Lineage}        || "N/A";
+  my \$scientific_name = \$taxon->{ScientificName} || \"N/A\";
+  my \$lineage         = \$taxon->{Lineage}        || \"N/A\";
 
   ### Save to CSV
   \$csv->print(\$out, [\$acc, \$scientific_name, \$taxid, \$lineage]);
