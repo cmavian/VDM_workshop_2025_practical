@@ -499,8 +499,7 @@ Unique viral contigs list: ${unique}
 Viral contigs FASTA:       ${viral_fasta}
 "
 
-echo "[COUNT] Number of viral contigs extracted:"
-grep -Ec "^>" ${viral_fasta}
+echo "[COUNT] Number of viral contigs extracted:"`grep -Ec "^>" ${viral_fasta}`
 
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/07.combine.sh</code></pre>
@@ -526,6 +525,8 @@ input_db=${workdir}'/data/database'
 FASTA="${input_db}/nt.fasta"
 DB='NTDB'
 if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
+if [[ ! -e ${output}/${DB}.nhr ]]; then
+	makeblastdb -out ${output}/${DB} -dbtyp 'nucl' -parse_seqids -n ${FASTA} -input_type 'fasta'; fi
 
 ###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
