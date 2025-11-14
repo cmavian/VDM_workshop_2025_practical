@@ -103,25 +103,25 @@ To run the script type:
 <pre><code>#!/bin/env bash
 
 THR=5
-###enabling conda environment and fastqc program
+### enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc"
 eval $ON
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/data/fastq'
 output=${workdir}'/results/01.fastqc_pretrim'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo '[INFO] Running FastQC pre-trim'
 
-###run fastqc
+### run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.f*q*
 echo -e "\n[DONE] Pretrim FastQC complete"
 
-###deactivating fastqc program
+### deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 
@@ -136,7 +136,7 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
-###activating program
+### activating program
 ON='module trimmomatic 1>/dev/null 2>/dev/null'
 eval ${ON}
 
@@ -145,10 +145,10 @@ input=${workdir}'/data/fastq'
 output=${workdir}'/results/02.trim_output'
 ADAPTERS=${workdir}'/data/adapters.fa'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if [[ ! -e ${output} ]]; then mkdir -p ${output}; fi
 
-###getting the SRA IDs and creating output files
+### getting the SRA IDs and creating output files
 for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
@@ -157,7 +157,7 @@ for FOW in $(ls ${input}/*.f*q* | grep -Ei "_r?1"); do
   P2=${output}/${ID}'_2.P.fq.gz'
   U2=${output}/${ID}'_2.U.fq.gz'
 
-  ###running program
+  ### running program
   echo "[INFO] trimming: ${ID}"
   trimmomatic PE -threads ${THR} -phred33 -summary ${output}/${ID}'_statsSummary.txt' \
     ${FOW} ${REV} ${P1} ${U1} ${P2} ${U2} \
@@ -177,25 +177,25 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
-###enabling conda environment and fastqc program
+### enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc 1>/dev/null 2>/dev/null"
 eval $ON
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/03.fastqc_posttrim'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo '[INFO] Running FastQC post-trim'
 
-###run fastqc
+### run fastqc
 fastqc -t ${THR} -o ${output}/ ${input}/*.P.fq.gz
 echo -e "\n[DONE] Post-trim FastQC complete\n"
 
-###deactivating fastqc program
+### deactivating fastqc program
 OFF='conda deactivate'
 eval ${OFF}
 
@@ -210,27 +210,27 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
-###enabling conda environment and fastqc program
+### enabling conda environment and fastqc program
 ON="module miniconda && conda activate fastqc 1>/dev/null 2>/dev/null"
 eval $ON
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input_pre=${workdir}'/results/01.fastqc_pretrim'
 input_post=${workdir}'/results/03.fastqc_posttrim'
 output=${workdir}'/results/04.multiqc'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo '[INFO] Runnig multiqc'
-###to join both results
+### to join both results
 #multiqc ${input_pre} ${input_post} -o ${output}
 
 multiqc ${input_pre}  -o ${output}/multiqc_pretrim
 multiqc ${input_post} -o ${output}/multiqc_posttrim
 
-###deactivating multiqc program
+### deactivating multiqc program
 OFF='conda deactivate'
 eval ${OFF}
 
@@ -249,19 +249,19 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
-###enabling conda environment and megahit program
+### enabling conda environment and megahit program
 ON="module miniconda && conda activate megahit 1>/dev/null 2>/dev/null"
 eval $ON
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/02.trim_output'
 output=${workdir}'/results/05.megahit'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-###run megahit
+### run megahit
 for FOW in $(ls ${input}/*_1.P.fq.gz); do
   REV=`echo ${FOW} | sed -r 's/\_(r|R)?1/\_\12/'`;
   ID=`basename ${FOW} | cut -d '_' -f1`
@@ -270,8 +270,8 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   echo "[INFO] assembling: ${ID}"
   megahit -t ${THR} -1 ${FOW} -2 ${REV} -o ${output}/${ID} 1>${LOG} 2>${LOG}
 
-  ###after megahit run, prepend sample name to contigs
-  ###(allows easier tracking of which contigs came from which sample in downstream analysis)
+  ### after megahit run, prepend sample name to contigs
+  ### (allows easier tracking of which contigs came from which sample in downstream analysis)
   awk -v prefix="${ID}_" '/^>/ {$0=">" prefix substr($0,2)} {print}
     ' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
 
@@ -279,7 +279,7 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   echo "[DONE] Megahit assmebly completed successfully and contigs named with sample name: ${ID}"
 done
 
-###deactivating megahit program
+### deactivating megahit program
 OFF='conda deactivate'
 eval ${OFF}
 
@@ -476,13 +476,10 @@ echo "[INFO] Filtering for viral hits..."
 grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
 grep -Ei "vir[us|idae|oid]" ${nrdb_out} > ${nrdb_virus}
 
-#grep -Ei "virus|viridae|viroid" ${rvdb_out} > ${rvdb_virus}
-#grep -Ei "virus|viridae|viroid" ${nrdb_out} > ${nrdb_virus}
-
 echo "[INFO] Extracting unique contig names..."
 awk '{print $1}' ${rvdb_virus} ${nrdb_virus} | sort -u > ${unique}
 
-# Activate seqkit environment
+### Activate seqkit environment
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval ${ON}
 
@@ -518,13 +515,13 @@ THR=5
 ON='module ncbi'
 eval ${ON}
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/07.combined/viral_contigs.fasta'
 output=${workdir}'/results/08.ncbi_ntdb'
 input_db=${workdir}'/data/database'
 
-###DB variables and directories
+### DB variables and directories
 DB='nt'
 if [[ ! -e ${input_db}/${DB}.nhr ]]; then
 	echo '[INFO] Indexing nucleotide NCBI database'
@@ -567,7 +564,7 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 blast_in=${workdir}'/results/08.ncbi_ntdb'
 output=${workdir}'/results/09.blastn_filtered'
@@ -577,12 +574,12 @@ virus_hits_list=${output}'/combined_blastn.virus_hits.blastn'
 unique_ids=${output}'/unique_ncbi_ntdb_contigs.txt'
 viral_fasta=${output}'/viral_contigs_blastn.fasta'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 echo "[INFO] Filtering BLASTn outputs for viral hits..."
 
-###Combine and filter
+### Combine and filter
 cat ${blastn_in}/*.blastn | grep -Ei "vir[us|idae|oid]" > ${virus_hits_list}
 
 echo "[INFO] Extracting unique contig IDs..."
@@ -590,7 +587,7 @@ awk '{print $1}' ${virus_hits_list} | sort -u > ${unique_ids}
 
 echo "[COUNT] Number of unique viral contigs: "`cat ${unique_ids} | wc -l`
 
-###Activate seqkit
+### Activate seqkit
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval "${ON}"
 
@@ -617,25 +614,25 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
-###enabling diamond program
+### enabling diamond program
 ON="module diamond 1>/dev/null 2>/dev/null"
 eval $ON
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
 output=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 input_db=${workdir}'/data/database'
 
-###DB variables and directories
+### DB variables and directories
 FASTA="${input_db}/nr.faa"
 DB='NRDB'
 if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-###make diamond protein database
+### make diamond protein database
 if [[ ! -e ${input_db}/${DB}.dmnd ]]; then
   diamond makedb --in ${FASTA} --threads ${THR} -d ${input_db}/${DB}; fi
 chmod a=rwx ${input_db}/${DB}.dmnd
@@ -673,7 +670,7 @@ exit 0;</code></pre>
 <pre><code>nano scripts/11.genbank_fetch.sh</code></pre>
 <pre><code>#!/bin/env bash
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 output=${workdir}'/results/11.genbank_fetch'
@@ -681,7 +678,7 @@ gb_final="${output}/11.final_gb.gb"
 
 #set -euo pipefail
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 for FILE in $(ls ${input}/*);do
@@ -726,7 +723,7 @@ for FILE in $(ls ${input}/*);do
 	    echo ${ACC} >> ${missing}
 	fi
 
-	###second attempt at genbank retrieval
+	### second attempt at genbank retrieval
 	if [[ -s ${missing} ]]; then
 	    awk 'NF' ${missing} >> ${missing_2}
 	    tr '\n' ',' < ${missing_2} | sed 's/,$/\n/' > ${missing_final}
@@ -741,7 +738,7 @@ for FILE in $(ls ${input}/*);do
         cat ${gb2} >> ${gb_final}
     fi
 
-	###clear files after
+	### clear files after
 	rm -f ${gb1} ${gb2} ${missing} ${missing_2} ${missing_final}
 done
 chmod -R a=rwx ${output}
@@ -758,14 +755,14 @@ THR=5
 ON='module miniconda && conda activate rsem'
 eval $ON
 
-###input and output directories
+### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
 output=${workdir}'/results/12.rsem'
 reads=${workdir}'/data/fastq'
 assemblies=${workdir}'/results/05.megahit'
 
-###make output directory if it doesn't exist
+### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 function RUN_RSEM {
@@ -788,7 +785,7 @@ function RUN_RSEM {
 
   echo "[INFO] Running RSEM for ${sample}"
 
-  ###Run RSEM using Trinity utility
+  ### Run RSEM using Trinity utility
   align_and_estimate_abundance.pl \
         --transcripts ${contigs} \
         --seqType fq \
@@ -806,7 +803,7 @@ function RUN_RSEM {
 export -f RUN_RSEM
 
 echo "[INFO] Starting RSEM quantification for samples..."
-###check and run in parallel
+### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
  ls -dl ${reads}/*.gz | grep -Ei '_r?1' | parallel -j ${THR} -n1 -I% "RUN_RSEM %" ${reads} ${assemblies} ${output} 1
