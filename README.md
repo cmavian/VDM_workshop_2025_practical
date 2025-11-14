@@ -35,7 +35,7 @@ You will be provided one together with your username at the beginning of the wor
 <b>Passwords are case sensitive and invisiable when typing !!!</b>
 Therefore, it is advisable to copy & paste the password.
 Successful connection will print the server's logo on your terminal.<br>
-<i>On average on a server you only have 2-5 tries to type the password afterwhich you'll be blocked for at least 30 minutes.
+<i>On average on a server you only have 2-5 tries to type the password after which you'll be blocked for at least 30 minutes.
 It is better to close the terminal and open it again and try again after the second failed password try.</i><br>
 
 <b><h3>Setting up our folder for the analysis</h3></b>
@@ -472,7 +472,6 @@ echo "[INFO] Concatenating VP blastx results..."
 cat ${nrdb_in}/*_nrdb.blastx > ${nrdb_out}
 
 echo "[INFO] Filtering for viral hits..."
-
 grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
 grep -Ei "vir[us|idae|oid]" ${nrdb_out} > ${nrdb_virus}
 
@@ -491,12 +490,12 @@ eval ${OFF}
 
 echo -en "
 [DONE]
-Combined RVDB blastx:      ${rvdb_out}
-Combined VP blastx:        ${vp_out}
-RVDB viral hits:           ${rvdb_virus}
-NRDB viral hits:           ${nrdb_virus}
+Combined RVDB blastx     : ${rvdb_out}
+Combined NRDB blastx     : ${nrdb_out}
+RVDB viral hits          : ${rvdb_virus}
+NRDB viral hits          : ${nrdb_virus}
 Unique viral contigs list: ${unique}
-Viral contigs FASTA:       ${viral_fasta}
+Viral contigs FASTA      : ${viral_fasta}
 "
 
 echo "[COUNT] Number of viral contigs extracted:"`grep -Ec "^>" ${viral_fasta}`
@@ -551,7 +550,7 @@ chmod -R a+rwx ${output}
 echo -en "
 BLASTN complete.
 Results written to: ${output}/viral_contigs_vs_nt.blastn
-Log:                ${output}/blastn.log
+Log               : ${output}/blastn.log
 "
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/08.ncbi_ntdb.sh</code></pre>
@@ -599,10 +598,10 @@ eval ${OFF}
 
 echo -en "
 [DONE]
-Viral hits table:          ${virus_hits_list}
-Unique contig list:        ${unique_ids}
-Viral contigs FASTA:       ${viral_fasta}
-Output directory:          ${output}
+Viral hits table   : ${virus_hits_list}
+Unique contig list : ${unique_ids}
+Viral contigs FASTA: ${viral_fasta}
+Output directory   : ${output}
 "
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/09.blastn_filtered</code></pre>
@@ -634,11 +633,11 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
 if [[ ! -e ${input_db}/${DB}.dmnd ]]; then
+  echo '[INFO] Indexing protein diamond nrdb database'
   diamond makedb --in ${FASTA} --threads ${THR} -d ${input_db}/${DB}; fi
 chmod a=rwx ${input_db}/${DB}.dmnd
 
-echo "[INFO] Using existing DIAMOND DB:"
-echo " ${DB}"
+echo "[INFO] Using existing DIAMOND DB: ${DB}"
 
 echo "[INFO] Running DIAMOND blastx..."
 diamond blastx \
@@ -654,12 +653,15 @@ diamond blastx \
     --unal 0 \
     2> ${output}'/diamond.log'
 
-chmod -R a=rwx ${output}
+echo '[INFO] extracting accession numbers'
+cat ${output}/viral_contigs_nrdb.blastx | awk '{print $3}' > ${output}/viral_contigs_nrdb.txt
+chmod -R a=rwx ${output}/*
 
 echo -en "
 [DONE]
-DIAMOND results: ${output}/viral_contigs_nedb.blastx
-Log:             ${output}/diamond.log
+DIAMOND results: ${output}/viral_contigs_nrdb.blastx
+ACCESSIONS     : ${output}/viral_contigs_nrdb.txt
+Log            : ${output}/diamond.log
 "
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
