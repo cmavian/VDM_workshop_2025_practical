@@ -432,7 +432,7 @@ exit 0;</code></pre>
 <pre><code>bash scripts/06.2.diamond_nrdb.sh</code></pre>
 </ol>
 
-<li>Combining results from both blastx seqrches</li><br>
+<li>Combining results from both blastx searches</li><br>
 
 <pre><code>nano scripts/07.combine.sh</code></pre>
 
