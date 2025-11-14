@@ -730,7 +730,7 @@ while (my $acc = <$in>) {
     my $sum_data = get($esummary_url);
     unless ($sum_data) { warn "  Failed to fetch ESummary for $acc\n"; next; }
 
-    my ($taxid) = $sum_data =~ /<Item Name="TaxId"[^>]*>(\d+)<\/Item>/;
+	my ($taxid) = $sum_data =~ /.*Name="TaxId"[^>]*>(\d+)<\/Item>/;
     unless ($taxid) { warn "  No TaxID found for $acc\n"; next; }
 
     ### Step 3: Get taxonomy lineage
