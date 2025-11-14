@@ -372,7 +372,7 @@ eval $ON
 ### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/05.megahit'
-output=${workdir}'/results/06.1.diamond_nrdb'
+output=${workdir}'/results/06.2.diamond_nrdb'
 input_db=${workdir}'/data/database'
 
 ### DB variables and directories
