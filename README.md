@@ -359,7 +359,7 @@ exit 0;</code></pre>
 <pre><code>bash scripts/06.1.diamond_rvdb.sh</code></pre>
 
 <li>Filtering viral sequences from NCBI protein database</li><br>
-<pre><code>nano 06.2.diamond_nrdb.sh</code></pre>
+<pre><code>nano scripts/06.2.diamond_nrdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -427,8 +427,8 @@ fi
 
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
-<pre><code>chmod a=rwx scripts/06.2.diamond_nrdb</code></pre>
-<pre><code>bash scripts/06.2.diamond_nrdb</code></pre>
+<pre><code>chmod a=rwx scripts/06.2.diamond_nrdb.sh</code></pre>
+<pre><code>bash scripts/06.2.diamond_nrdb.sh</code></pre>
 </ol>
 
 <li>Combining results from both blastx seqrches</li><br>
