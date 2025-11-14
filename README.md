@@ -96,6 +96,7 @@ To run the script type:
 <ol start=1>
 <h4><li>FastQC pre-Trimmomatic</li></h4>
 <pre><code>nano scripts/01.fastqc_pretrim.sh</code></pre>
+	
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -128,6 +129,7 @@ exit 0; </code></pre>
 
 <h4><li>Trimmomatic</li></h4>
 <pre><code>nano scripts/02.trimmomatic.sh</code></pre><br>
+
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -168,6 +170,7 @@ exit 0;</code></pre>
 
 <h4><li>FastQC post-Trimmomatic</li></h4>
 <pre><code>nano scripts/03.fastqc_posttrim.sh</code></pre>
+
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -200,6 +203,7 @@ exit 0; </code></pre>
 
 <h4><li>MultiQC</li></h4>
 <pre><code>nano  scripts/04.multiqc.sh</code></pre>
+
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -237,6 +241,7 @@ exit 0; </code></pre>
 
 <h4><li>Megahit</li></h4>
 <pre><code>nano  scripts/05.megahit.sh</code></pre>
+
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -276,6 +281,7 @@ eval ${OFF}
 chmod -R a=rwx ${output}
 exit 0; </code></pre>
 <pre><code>chmod a=rwx  scripts/05.megahit.sh</code></pre>
+
 <pre><code>bash  scripts/05.megahit.sh</code></pre>
 
 <h4><li>Diamond</li></h4>
@@ -425,6 +431,7 @@ exit 0; </code></pre>
 </ol>
 
 <li>Combining results from both blastx seqrches</li><br>
+
 <pre><code>nano scripts/07.combine.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -499,6 +506,7 @@ exit 0; </code></pre>
 
 <li>Filtering viral sequences from NCBI nucleotide database</li><br>
 <pre><code>nano scripts/08.ncbi_ntdb.sh</code></pre>
+
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -544,10 +552,12 @@ Log:                ${output}/blastn.log
 "
 exit 0; </code></pre>
 <pre><code>chmod a=rwx scripts/08.ncbi_ntdb.sh</code></pre>
+
 <pre><code>bash scripts/08.ncbi_ntdb.sh</code></pre>
 
 <li>Combining and filtering sequences from NCBI nucleotide database</li><br>
 <pre><code>nano scripts/09.blastn_filtered</code></pre>
+
 <pre><code>#!/bin/env bash
 
 ###input and output directories
@@ -597,6 +607,7 @@ exit 0; </code></pre>
 <pre><code>bash scripts/09.blastn_filtered</code></pre>
 
 <li>Combining and filtering sequences from NCBI nucleotide database</li><br>
+
 <pre><code>nano scripts/10.diamond_blastx_blastn_contigs</code></pre>
 <pre><code>#!/bin/env bash
 
@@ -652,6 +663,7 @@ exit 0; </code></pre>
 <pre><code>bash scripts/10.diamond_blastx_blastn_contigs</code></pre>
 
 <li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
+
 <pre><code>nano scripts/11.genbank_fetch</code></pre>
 <pre><code>#!/bin/env bash
 
@@ -733,6 +745,7 @@ exit 0; </code></pre>
 
 <li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
 <pre><code>nano scripts/12.rsem</code></pre>
+
 <pre><code>#!/bin/env bash
 
 THR=5
