@@ -10,6 +10,7 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 2. [Trimmomatic](https://github.com/usadellab/Trimmomatic)
 3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
+5. [NCBI BLAST](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
 </list>
 <figure>
     <img src="workflow.png" width="920" height="1200">
@@ -25,6 +26,8 @@ Using one of the emulators, open a terminal and connect to host by typing:
 
 <pre><code>ssh username@ceri.sarmc.ac.za</code></pre>
 
+List of usernames and passwords is avalable under [USERNAME LIST](https://docs.google.com/spreadsheets/d/1n9_X7WztBnIPJ1bgNOBT3rxLMiI8FbEFKeIVxaJ-FOM/edit?usp=drive_link)<br>
+The passwords are only valid for <b>next 7 days</b>.<br>
 First time connecting you will be ask if you trust the connection. 
 You have to type 'yes' and press enter.
 Then you will be asked to provide password.
@@ -432,7 +435,7 @@ exit 0;</code></pre>
 <pre><code>bash scripts/06.2.diamond_nrdb.sh</code></pre>
 </ol>
 
-<li>Combining results from both blastx searches</li><br>
+<li>Combining results from both blastx seqrches</li><br>
 
 <pre><code>nano scripts/07.combine.sh</code></pre>
 
@@ -465,7 +468,7 @@ cat ${contigs_in}/*.contigs.fasta > ${combined_contigs}
 echo "[INFO] Concatenating RVDB blastx results..."
 cat ${rvdb_in}/*_rvdb.blastx > ${rvdb_out}
 
-echo "[INFO] Concatenating NRDB blastx results..."
+echo "[INFO] Concatenating VP blastx results..."
 cat ${nrdb_in}/*_nrdb.blastx > ${nrdb_out}
 
 echo "[INFO] Filtering for viral hits..."
@@ -473,10 +476,13 @@ echo "[INFO] Filtering for viral hits..."
 grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
 grep -Ei "vir[us|idae|oid]" ${nrdb_out} > ${nrdb_virus}
 
+#grep -Ei "virus|viridae|viroid" ${rvdb_out} > ${rvdb_virus}
+#grep -Ei "virus|viridae|viroid" ${nrdb_out} > ${nrdb_virus}
+
 echo "[INFO] Extracting unique contig names..."
 awk '{print $1}' ${rvdb_virus} ${nrdb_virus} | sort -u > ${unique}
 
-### Activate seqkit environment
+# Activate seqkit environment
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval ${ON}
 
@@ -489,7 +495,7 @@ eval ${OFF}
 echo -en "
 [DONE]
 Combined RVDB blastx:      ${rvdb_out}
-Combined NRDB blastx:      ${nrdb_out}
+Combined VP blastx:        ${vp_out}
 RVDB viral hits:           ${rvdb_virus}
 NRDB viral hits:           ${nrdb_virus}
 Unique viral contigs list: ${unique}
@@ -519,10 +525,8 @@ output=${workdir}'/results/08.ncbi_ntdb'
 input_db=${workdir}'/data/database'
 
 ###DB variables and directories
-FASTA="${input_db}/nt.fasta"
-DB='NTDB'
-if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
-if [[ ! -e ${output}/${DB}.nhr ]]; then
+DB='nt'
+if [[ ! -e ${input_db}/${DB}.nhr ]]; then
 	echo '[INFO] Indexing nucleotide NCBI database'
 	makeblastdb -out ${output}/${DB} -dbtyp 'nucl' -parse_seqids -n ${FASTA} -input_type 'fasta'; fi
 
