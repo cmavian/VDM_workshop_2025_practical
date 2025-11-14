@@ -793,7 +793,7 @@ function RUN_RSEM {
   REV=`echo ${FOW} | sed -r 's,_(r|R)?1,_\12,'`
   sample=`basename ${FOW} | cut -d '_' -f1`
 
-  contigs="${assembly_dir}/${sample}/${sample}.contigs.fasta"
+  contigs="${assembly_dir}/${sample}.contigs.fasta"
   out_prefix="${out_dir}/${sample}.RSEM"
 
   if [[ ! -f ${contigs} ]]; then
@@ -828,9 +828,9 @@ echo "[INFO] Starting RSEM quantification for samples..."
 ### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
- ls -dl ${reads}/*.gz | grep -Ei '_r?1' | parallel -j ${THR} -n1 -I% "RUN_RSEM %" ${reads} ${assemblies} ${output} 1
+ ls -dl ${reads}/*.gz | awk '{print $9}' | grep -Ei '_r?1' | parallel -j ${THR} -n1 -I% "RUN_RSEM %" ${reads} ${assemblies} ${output} 1
 else
- for FILE in $(ls -dl ${reads}/*.gz | grep -Ei '_r?1'); do
+ for FILE in $(ls -dl ${reads}/*.gz | awk '{print $9}' | grep -Ei '_r?1'); do
   RUN_RSEM ${FILE} ${reads} ${assemblies} ${output} 1
  done
 fi
