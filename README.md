@@ -10,6 +10,7 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 2. [Trimmomatic](https://github.com/usadellab/Trimmomatic)
 3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
+5. [NCBI BLAST](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
 </list>
 <figure>
     <img src="workflow.png" width="920" height="1200">
@@ -25,6 +26,8 @@ Using one of the emulators, open a terminal and connect to host by typing:
 
 <pre><code>ssh username@ceri.sarmc.ac.za</code></pre>
 
+List of usernames and passwords is avalable under [USERNAME LIST](https://docs.google.com/spreadsheets/d/1n9_X7WztBnIPJ1bgNOBT3rxLMiI8FbEFKeIVxaJ-FOM/edit?usp=drive_link)<br>
+The passwords are only valid for <b>next 7 days</b>.<br>
 First time connecting you will be ask if you trust the connection. 
 You have to type 'yes' and press enter.
 Then you will be asked to provide password.
@@ -522,10 +525,9 @@ output=${workdir}'/results/08.ncbi_ntdb'
 input_db=${workdir}'/data/database'
 
 ###DB variables and directories
-FASTA="${input_db}/nt.fasta"
-DB='NTDB'
-if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
-if [[ ! -e ${output}/${DB}.nhr ]]; then
+DB='nt'
+if [[ ! -e ${input_db}/${DB}.nhr ]]; then
+	echo '[INFO] Indexing nucleotide NCBI database'
 	makeblastdb -out ${output}/${DB} -dbtyp 'nucl' -parse_seqids -n ${FASTA} -input_type 'fasta'; fi
 
 ###make output directory if it doesn't exist
@@ -534,10 +536,11 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 echo -en "
 Running BLASTN against nt database...
 Query: ${input}
-DB:    ${DB}"
+DB:    ${DB}
+"
 
 blastn \
-    -db ${DB} \
+    -db ${input_db}/${DB} \
     -query ${input} \
     -out ${output}'/viral_contigs_vs_nt.blastn' \
     -num_threads ${THR} \
