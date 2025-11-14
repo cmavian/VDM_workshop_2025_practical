@@ -565,7 +565,6 @@ exit 0;</code></pre>
 ###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 blast_in=${workdir}'/results/08.ncbi_ntdb'
-output=${workdir}'/results/07.combine/08.ncbi_ntdb'
 input_db=${workdir}'/data/database'
 output=${workdir}'/results/09.blastn_filtered'
 
@@ -621,7 +620,7 @@ eval $ON
 ###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
-output=${workdir}'/results/07.combine/10.diamond_blastx_blastn_contigs'
+output=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 
 ###DB variables and directories
 FASTA="${input_db}/nr.faa"
