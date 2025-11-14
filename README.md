@@ -566,11 +566,12 @@ exit 0;</code></pre>
 
 <pre><code>#!/bin/env bash
 
+THR=5
 ###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 blast_in=${workdir}'/results/08.ncbi_ntdb'
-input_db=${workdir}'/data/database'
 output=${workdir}'/results/09.blastn_filtered'
+combined_contigs=${workdir}'/results/07.combined/all_contigs.fasta'
 
 virus_hits_list=${output}'/combined_blastn.virus_hits.blastn'
 unique_ids=${output}'/unique_ncbi_ntdb_contigs.txt'
@@ -587,15 +588,14 @@ cat ${blastn_in}/*.blastn | grep -Ei "vir[us|idae|oid]" > ${virus_hits_list}
 echo "[INFO] Extracting unique contig IDs..."
 awk '{print $1}' ${virus_hits_list} | sort -u > ${unique_ids}
 
-echo "[COUNT] Number of unique viral contigs:"
-wc -l ${unique_ids}
+echo "[COUNT] Number of unique viral contigs: "`cat ${unique_ids} | wc -l`
 
 ###Activate seqkit
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval "${ON}"
 
 echo "[INFO] Extracting viral contigs using seqkit..."
-seqkit grep -f ${unique_ids} ${combined_contigs} > ${viral_fasta}
+seqkit grep -j ${THR} -f ${unique_ids} ${combined_contigs} > ${viral_fasta}
 
 OFF='conda deactivate'
 eval ${OFF}
@@ -613,7 +613,7 @@ exit 0;</code></pre>
 
 <li>Combining and filtering sequences from NCBI nucleotide database</li><br>
 
-<pre><code>nano scripts/10.diamond_blastx_blastn_contigs</code></pre>
+<pre><code>nano scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 <pre><code>#!/bin/env bash
 
 THR=5
@@ -625,6 +625,7 @@ eval $ON
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
 output=${workdir}'/results/10.diamond_blastx_blastn_contigs'
+input_db=${workdir}'/data/database'
 
 ###DB variables and directories
 FASTA="${input_db}/nr.faa"
@@ -635,18 +636,18 @@ if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ###make diamond protein database
-if [[ ! -e ${output}/${DB}.dmnd ]]; then
-  diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
-chmod a=rwx ${output}/${DB}.dmnd
+if [[ ! -e ${input_db}/${DB}.dmnd ]]; then
+  diamond makedb --in ${FASTA} --threads ${THR} -d ${input_db}/${DB}; fi
+chmod a=rwx ${input_db}/${DB}.dmnd
 
 echo "[INFO] Using existing DIAMOND DB:"
 echo " ${DB}"
 
 echo "[INFO] Running DIAMOND blastx..."
 diamond blastx \
-    -d ${DB} \
+    -d ${input_db}/${DB} \
     -q ${input} \
-    --out ${output}'/viral_contigs_NR.blastx' \
+    --out ${output}'/viral_contigs_nrdb.blastx' \
     --threads ${THR} \
     --evalue 1e-5 \
     --max-target-seqs 25 \
@@ -660,16 +661,16 @@ chmod -R a=rwx ${output}
 
 echo -en "
 [DONE]
-DIAMOND results: ${output}/viral_contigs_NR.blastx
+DIAMOND results: ${output}/viral_contigs_nedb.blastx
 Log:             ${output}/diamond.log
 "
 exit 0;</code></pre>
-<pre><code>chmod a=rwx scripts/10.diamond_blastx_blastn_contigs</code></pre>
-<pre><code>bash scripts/10.diamond_blastx_blastn_contigs</code></pre>
+<pre><code>chmod a=rwx scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
+<pre><code>bash scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 
 <li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
 
-<pre><code>nano scripts/11.genbank_fetch</code></pre>
+<pre><code>nano scripts/11.genbank_fetch.sh</code></pre>
 <pre><code>#!/bin/env bash
 
 ###input and output directories
@@ -745,11 +746,11 @@ for FILE in $(ls ${input}/*);do
 done
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
-<pre><code>chmod a=rwx scripts/11.genbank_fetch</code></pre>
-<pre><code>bash scripts/11.genbank_fetch</code></pre>
+<pre><code>chmod a=rwx scripts/11.genbank_fetch.sh</code></pre>
+<pre><code>bash scripts/11.genbank_fetch.sh</code></pre>
 
 <li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
-<pre><code>nano scripts/12.rsem</code></pre>
+<pre><code>nano scripts/12.rsem.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -819,5 +820,5 @@ OFF='conda deactivate'
 eval ${OFF}
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
-<pre><code>chmod a=rwx scripts/12.rsem</code></pre>
-<pre><code>bash scripts/12.rsem</code></pre>
+<pre><code>chmod a=rwx scripts/12.rsem.sh</code></pre>
+<pre><code>bash scripts/12.rsem.sh</code></pre>
