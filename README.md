@@ -678,71 +678,84 @@ input=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 output=${workdir}'/results/11.genbank_fetch'
 gb_final="${output}/11.final_gb.gb"
 
-#set -euo pipefail
+echo '[INFO] Creating Perl script to fetch taxonomy';
 
-### make output directory if it doesn't exist
-if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+echo -en "#!/usr/bin/env perl
 
-for FILE in $(ls ${input}/*);do
-	#first attempt at genbank page retrieval
-	name=$(basename -s .txt ${FILE})
-	gb1=${output}/${name}_1.gb
-	gb2=${output}/${name}_2.gb
-	missing=${output}/${name}_missing.lst
-	missing_2=${output}/${name}_missing_2.lst
-	missing_final=${output}/${name}_missing_final.lst
-	accessions=$(cat ${FILE})
-	url1="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${accessions}&rettype=gb&retmode=text" 
-	curl -N -L --retry 5 --retry-delay 2 ${url1} -o ${gb1}
+use strict;
+use warnings;
+use LWP::Simple;
+use XML::Simple;
+use Text::CSV;
 
-	#check that all accessions present if not write out to missing list
-	ON=0
-	ACC=""
+### Usage:
+###   perl get_taxonomy_lineage.pl accessions.txt output_dir
 
-	while IFS= read -r line; do
-	    if [[ ${line} =~ ^LOCUS ]]; then
-	        if [[ ${ON} -eq 1 ]]; then
-	            echo ${ACC} >> ${missing}
-	        fi
-	        ON=1
-	        ACC=""
-	        continue
-	    fi
+my \$input_file = \$ARGV[0] or die \"Usage: $0 accessions.txt output_dir\\n\";
+my \$output_dir = \$ARGV[1] or die \"Specify output directory\\n\";
 
-	    if [[ ${line} =~ ^ACCESSION ]]; then
-	        ACC=$(echo ${line} | awk '{print $2}')
-	        continue
-	    fi
+open(my \$in, \"<\", \$input_file) or die \"Cannot open \$input_file: \$!\\n\";
 
-	    if [[ ${line} =~ ^// ]]; then
-	        ON=0
-	        ACC=""
-	        continue
-	    fi
-	done < ${gb1}
+my \$csv = Text::CSV->new({ binary => 1, eol => \"\\n\" });
+open(my \$out, ">$output_dir/taxonomy_lineage.csv\") or die \"Cannot write to output file: \$!\\n\";
+\$csv->print(\$out, [\"Accession\", \"Organism\", \"TaxID\", \"Lineage\"]);
 
-	if [[ ${ON} -eq 1 && -n ${ACC} ]]; then
-	    echo ${ACC} >> ${missing}
-	fi
+while (my \$acc = <\$in>) {
+  chomp \$acc;
+  next unless \$acc;
+  print \"Processing \$acc...\\n\";
 
-	### second attempt at genbank retrieval
-	if [[ -s ${missing} ]]; then
-	    awk 'NF' ${missing} >> ${missing_2}
-	    tr '\n' ',' < ${missing_2} | sed 's/,$/\n/' > ${missing_final}
-	    accessions=$(cat ${missing_final})
-	    url2="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=protein&id=${accessions}&rettype=gb&retmode=text" 
-	    curl -N -L --retry 5 --retry-delay 2 ${url2} -o ${gb2}
-	fi
+  ### Step 1: Search for accession in protein DB
+  my \$esearch_url =
+    \"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=protein&term=\$acc&retmode=xml\";
 
-	###write out retrieved entries to final.gb file for file processed
-	cat ${gb1} >> ${gb_final}
-	if [[ -s ${gb2} ]]; then
-        cat ${gb2} >> ${gb_final}
-    fi
+  my \$xml_data = get(\$esearch_url);
+  unless (\$xml_data) { warn \"  Failed to fetch ESearch for \$acc\\n\"; next; }
 
-	### clear files after
-	rm -f ${gb1} ${gb2} ${missing} ${missing_2} ${missing_final}
-done
+  my \$xml = eval { XMLin(\$xml_data) };
+  if (\$@ || !\$xml->{IdList}->{Id}) { warn \"  No ID found for \$acc\\n\"; next; }
+
+  my \$id = ref(\$xml->{IdList}->{Id}) eq 'ARRAY'
+         ? \$xml->{IdList}->{Id}[0]
+         : \$xml->{IdList}->{Id};
+  ### Step 2: Fetch ESummary to get TaxID
+  my \$esummary_url =
+    \"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=protein&id=\$id&retmode=xml\";
+
+  my \$sum_data = get(\$esummary_url);
+  unless (\$sum_data) { warn \"  Failed to fetch ESummary for \$acc\\n\"; next; }
+
+  my (\$taxid) = \$sum_data =~ /<Item Name=\"TaxId\"[^>]*>(\\d+)<\/Item>/;
+
+  unless (\$taxid) { warn \"  No TaxID found for \$acc\\n\"; next; }
+
+  ### Step 3: Get taxonomy lineage
+  my \$efetch_url =
+    \"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id=\$taxid&retmode=xml\";
+
+  my \$tax_data = get(\$efetch_url);
+  unless (\$tax_data) { warn \"  Failed to fetch taxonomy for TaxID \$taxid (\$acc)\\n\"; next; }
+
+  my \$tax_xml = eval { XMLin(\$tax_data) };
+  if (\$@ || !\$tax_xml->{Taxon}) { warn \"  Failed to parse taxonomy XML for TaxID \$taxid\\n\"; next; }
+
+  ### Taxon may be array or hash
+  my \$taxon = \$tax_xml->{Taxon};
+  \$taxon = \$taxon->[0] if ref(\$taxon) eq 'ARRAY';
+
+  my \$scientific_name = \$taxon->{ScientificName} || "N/A";
+  my \$lineage         = \$taxon->{Lineage}        || "N/A";
+
+  ### Save to CSV
+  \$csv->print(\$out, [\$acc, \$scientific_name, \$taxid, \$lineage]);
+}
+
+close \$in and close \$out;
+
+print \"\\nDone! Results saved to \$output_dir/taxonomy_lineage.csv\\n\";
+" >${workdir}/scripts/get_taxonomy_lineage.pl
+perl ${workdir}/scripts/get_taxonomy_lineage.pl  ${input}'/viral_contigs_nrdb.txt' ${output}
+
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/11.genbank_fetch.sh</code></pre>
