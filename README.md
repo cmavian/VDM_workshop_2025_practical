@@ -465,7 +465,7 @@ cat ${contigs_in}/*.contigs.fasta > ${combined_contigs}
 echo "[INFO] Concatenating RVDB blastx results..."
 cat ${rvdb_in}/*_rvdb.blastx > ${rvdb_out}
 
-echo "[INFO] Concatenating VP blastx results..."
+echo "[INFO] Concatenating NRDB blastx results..."
 cat ${nrdb_in}/*_nrdb.blastx > ${nrdb_out}
 
 echo "[INFO] Filtering for viral hits..."
@@ -473,13 +473,10 @@ echo "[INFO] Filtering for viral hits..."
 grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
 grep -Ei "vir[us|idae|oid]" ${nrdb_out} > ${nrdb_virus}
 
-#grep -Ei "virus|viridae|viroid" ${rvdb_out} > ${rvdb_virus}
-#grep -Ei "virus|viridae|viroid" ${nrdb_out} > ${nrdb_virus}
-
 echo "[INFO] Extracting unique contig names..."
 awk '{print $1}' ${rvdb_virus} ${nrdb_virus} | sort -u > ${unique}
 
-# Activate seqkit environment
+### Activate seqkit environment
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval ${ON}
 
@@ -492,7 +489,7 @@ eval ${OFF}
 echo -en "
 [DONE]
 Combined RVDB blastx:      ${rvdb_out}
-Combined VP blastx:        ${vp_out}
+Combined NRDB blastx:      ${nrdb_out}
 RVDB viral hits:           ${rvdb_virus}
 NRDB viral hits:           ${nrdb_virus}
 Unique viral contigs list: ${unique}
@@ -526,6 +523,7 @@ FASTA="${input_db}/nt.fasta"
 DB='NTDB'
 if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
 if [[ ! -e ${output}/${DB}.nhr ]]; then
+	echo '[INFO] Indexing nucleotide NCBI database'
 	makeblastdb -out ${output}/${DB} -dbtyp 'nucl' -parse_seqids -n ${FASTA} -input_type 'fasta'; fi
 
 ###make output directory if it doesn't exist
@@ -534,10 +532,11 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 echo -en "
 Running BLASTN against nt database...
 Query: ${input}
-DB:    ${DB}"
+DB:    ${DB}
+"
 
 blastn \
-    -db ${DB} \
+    -db ${input_db}/${DB} \
     -query ${input} \
     -out ${output}'/viral_contigs_vs_nt.blastn' \
     -num_threads ${THR} \
