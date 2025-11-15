@@ -445,7 +445,7 @@ exit 0;</code></pre>
 <pre><code>bash scripts/06.2.diamond_nrdb.sh</code></pre>
 </ol>
 
-<li>Combining results from both blastx seqrches</li><br>
+<li>Combining results from both blastx searches</li><br>
 
 <pre><code>nano scripts/07.combine.sh</code></pre>
 
@@ -778,7 +778,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/11.genbank_fetch.sh</code></pre>
 <pre><code>bash scripts/11.genbank_fetch.sh</code></pre>
 
-<li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
+<li>Align and estimate abundance with RSEM</li><br>
 <pre><code>nano scripts/12.rsem.sh</code></pre>
 
 <pre><code>#!/bin/env bash
