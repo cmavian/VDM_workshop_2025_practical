@@ -325,14 +325,14 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
 echo '[INFO] Reading database file '{$DB}
-if [[ ! -e ${output}/${DB}.dmnd ]]; then
-  diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
-chmod a=rwx ${output}/${DB}.dmnd
+if [[ ! -e ${input_db}/${DB}.dmnd ]]; then
+  diamond makedb --in ${FASTA} --threads ${THR} -d ${input_db}/${DB}; fi
+chmod a=rwx ${input_db}/${DB}.dmnd
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
 function DBLX {
- FOLDER=$1; OUT=$2; DB=$3; T=$4;
+ FOLDER=$1; OUT=$2; DB=$3; T=$4; DBDIR=$5;
   ID=$(basename $1)
   CONTIGS=${FOLDER}/${ID}.contigs.fasta
   LOG=${OUT}/${ID}.log
@@ -340,7 +340,7 @@ function DBLX {
   if [[ -f ${CONTIGS} ]]; then
 	echo "[INFO] Analyzing sample ${ID}"
     sample_out=${OUT}/${ID}_rvdb.blastx
-    diamond blastx -d ${OUT}/${DB}.dmnd \
+    diamond blastx -d ${DBDIR}/${DB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
     --threads ${T} \
@@ -359,10 +359,10 @@ export -f DBLX
 ### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
- ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1
+ ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1 ${input_db}
 else
  for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
-  DBLX ${FOLDER} ${output} ${DB} 1
+  DBLX ${FOLDER} ${output} ${DB} 1 ${input_db}
  done
 fi
 
@@ -397,14 +397,14 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ### make diamond protein database
 echo '[INFO] Reading database file '{$DB}
-if [[ ! -e ${output}/${DB}.dmnd ]]; then
-  diamond makedb --in ${FASTA} --threads ${THR} -d ${output}/${DB}; fi
-chmod a=rwx ${output}/${DB}.dmnd
+if [[ ! -e ${input_db}/${DB}.dmnd ]]; then
+  diamond makedb --in ${FASTA} --threads ${THR} -d ${input_db}/${DB}; fi
+chmod a=rwx ${input_db}/${DB}.dmnd
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
 function DBLX {
- FOLDER=$1; OUT=$2; DB=$3; T=$4;
+ FOLDER=$1; OUT=$2; DB=$3; T=$4; DBDIR=$5;
   ID=$(basename $1)
   CONTIGS=${FOLDER}/${ID}.contigs.fasta
   LOG=${OUT}/${ID}.log
@@ -412,7 +412,7 @@ function DBLX {
   if [[ -f ${CONTIGS} ]]; then
 	echo "[INFO] Analyzing sample ${ID}"
     sample_out=${OUT}/${ID}_nrdb.blastx
-    diamond blastx -d ${OUT}/${DB}.dmnd \
+    diamond blastx -d ${DBDIR}/${DB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
     --threads ${T} \
@@ -431,10 +431,10 @@ export -f DBLX
 ### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
- ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1
+ ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1 ${input_db}
 else
  for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
-  DBLX ${FOLDER} ${output} ${DB} 1
+  DBLX ${FOLDER} ${output} ${DB} 1 ${input_db}
  done
 fi
 
@@ -531,9 +531,9 @@ input_db=${workdir}'/data/database'
 
 ### DB variables and directories
 DB='nt'
-if [[ ! -e ${input_db}/${DB}.nhr ]]; then
-	echo '[INFO] Indexing nucleotide NCBI database'
-	makeblastdb -out ${output}/${DB} -dbtyp 'nucl' -parse_seqids -n ${FASTA} -input_type 'fasta'; fi
+if [[ ! -e ${input_db}/${DB}/${DB}.nhr ]]; then
+  echo '[INFO] Indexing nucleotide NCBI database'
+  makeblastdb -out ${input_db}/${DB}/${DB} -dbtyp 'nucl' -parse_seqids -n ${input_db}/${DB}/${DB}.fasta -input_type 'fasta'; fi
 
 ###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
@@ -545,7 +545,7 @@ DB:    ${DB}
 "
 
 blastn \
-    -db ${input_db}/${DB} \
+    -db ${input_db}/${DB}/${DB} \
     -query ${input} \
     -out ${output}'/viral_contigs_vs_nt.blastn' \
     -num_threads ${THR} \
