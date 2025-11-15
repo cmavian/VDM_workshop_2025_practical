@@ -80,17 +80,16 @@ Then change permissions on all of the directories and in them:
 To check if everything was created correctly, list the current directory.
 <pre><code>ll *</code></pre>
 
-<li>Let's go into data directory and copy our files</li><br>
-<pre><code>cd data</code></pre>
-Downloading files from website:
-<pre><code>wget <a href="https://">https://</a></code></pre>
-Cloning a github repository:
-<pre><code>git clone <a href="github.com">github.com</a></code></pre>
-Alternatively, if the internet connection is slow, you can copy the data from backup location:
-<pre><code> cp -R /analyses/vdworkshop/.backup/data/* ./ </code></pre>
+<li>Let's copy our raw data files</li><br>
+Usually Data are located online, either in a cloud account or a database accessible via webside address. To download files from website you need to use command <i>wget</i>:<br>
+<code>wget <a href="https://">https://</a></code><br>
+Unfortunately this command does not work on Google or One Drive links. Data from Github can be downloaded by cloning a github repository:<br>
+<code>git clone <a href="github.com">github.com</a></code><br>
+Our data are already on the server and you can copy them to the designated location:
+<pre><code>cp -R /analyses/vdworkshop/data/* ./data </code></pre>
 Then change permission on the files and confirm the change on the data in the location:
-<pre><code>chmod a=rwx *
-ll *</code></pre>
+<pre><code>chmod a=rwx ./data/*
+ll ./data/*</code></pre>
 </ol>
 
 <b><h3>Analysis</h3></b>
