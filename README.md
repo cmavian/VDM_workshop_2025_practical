@@ -11,7 +11,16 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
 5. [NCBI BLAST](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
+6. [RSEM](https://github.com/deweylab/RSEM) and [TRINITY](https://github.com/trinityrnaseq/trinityrnaseq/wiki)
 </list>
+These programs can be installed under conda environment:
+
+1. Install [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install) environment
+2. Create conda environment:
+   <pre><code>conda create -n viral_discovery -c bioconda -c conda-forge python=3.12 rsem trinityrnaseq samtools=1.21 bowtie2 trimmomatic fastqc megahit diamond blast</code></pre>
+4. activate the environment in the scripts:
+   <pre><code>ON='conda activate viral_discovery' && eval ${ON}</code></pre>
+
 <figure>
     <img src="workflow.png" width="920" height="1200">
     <figcaption><b>Figure 1.</b> Virus discovery pipeline Workflow by Nokuzotha Nkiwane </figcaption>
