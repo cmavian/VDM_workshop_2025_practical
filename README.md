@@ -211,10 +211,10 @@ eval ${OFF}
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
 <pre><code>chmod a=rwx  scripts/03.fastqc_posttrim.sh</code></pre>
-<pre><code>bash  scripts/03.fastqc_posttrim.sh</code></pre>
+<pre><code>bash scripts/03.fastqc_posttrim.sh</code></pre>
 
 <h4><li>MultiQC</li></h4>
-<pre><code>nano  scripts/04.multiqc.sh</code></pre>
+<pre><code>nano scripts/04.multiqc.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -250,10 +250,10 @@ zip -9r ${output}/multiqc_posttrim.zip ${output}/multiqc_posttrim
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
 <pre><code>chmod a=rwx  scripts/04.multiqc.sh</code></pre>
-<pre><code>bash  scripts/04.multiqc.sh</code></pre>
+<pre><code>bash scripts/04.multiqc.sh</code></pre>
 
 <h4><li>Megahit</li></h4>
-<pre><code>nano  scripts/05.megahit.sh</code></pre>
+<pre><code>nano scripts/05.megahit.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -294,9 +294,9 @@ eval ${OFF}
 
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
-<pre><code>chmod a=rwx  scripts/05.megahit.sh</code></pre>
+<pre><code>chmod a=rwx scripts/05.megahit.sh</code></pre>
 
-<pre><code>bash  scripts/05.megahit.sh</code></pre>
+<pre><code>bash scripts/05.megahit.sh</code></pre>
 
 <h4><li>Diamond</li></h4>
 <ol start=i>
