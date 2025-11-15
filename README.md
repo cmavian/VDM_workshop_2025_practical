@@ -15,7 +15,7 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 </list>
 These programs can be installed under conda environment:
 
-1. Install [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install) environment
+1. Install [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install)
 2. Create conda environment:
    <pre><code>conda create -n viral_discovery -c bioconda -c conda-forge python=3.12 rsem trinityrnaseq samtools=1.21 bowtie2 trimmomatic fastqc megahit diamond blast</code></pre>
 4. activate the environment in the scripts:
