@@ -85,6 +85,8 @@ To check if everything was created correctly, list the current directory.
 <pre><code>cd data</code></pre>
 Downloading files from website:
 <pre><code>wget <a href="https://">https://</a></code></pre>
+Cloning a github repository:
+<pre><code>git clone <a href="github.com">github.com</a></code></pre>
 Alternatively, if the internet connection is slow, you can copy the data from backup location:
 <pre><code> cp -R /analyses/vdworkshop/.backup/data/* ./ </code></pre>
 Then change permission on the files and confirm the change on the data in the location:
