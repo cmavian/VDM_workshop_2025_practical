@@ -69,8 +69,7 @@ It is better to close the terminal and open it again and try again after the sec
 
 <li>First step will be creating a working folder in workspace folder and moving into the freshly created directory</li>
 <pre><code>cd ~/workspace
-mkdir -p metagenomics
-cd metagenomics</code></pre>
+mkdir -p metagenomics && cd metagenomics</code></pre>
 To check if the location was changed, print working directory
 <pre><code>pwd</code></pre>
 
