@@ -35,8 +35,7 @@ Using one of the emulators, open a terminal and connect to host by typing:
 
 <pre><code>ssh username@ceri.sarmc.ac.za</code></pre>
 
-List of usernames and passwords is avalable under [USERNAME LIST](https://docs.google.com/spreadsheets/d/1n9_X7WztBnIPJ1bgNOBT3rxLMiI8FbEFKeIVxaJ-FOM/edit?usp=drive_link)<br>
-The passwords are only valid for <b>next 7 days</b>.<br>
+List of usernames and passwords is avalable under [USERNAME LIST](https://docs.google.com/spreadsheets/d/1n9_X7WztBnIPJ1bgNOBT3rxLMiI8FbEFKeIVxaJ-FOM/edit?usp=drive_link). The passwords are only valid for <b>next 7 days</b>.<br>
 First time connecting you will be ask if you trust the connection. 
 You have to type 'yes' and press enter.
 Then you will be asked to provide password.
@@ -95,7 +94,7 @@ ll *</code></pre>
 </ol>
 
 <b><h3>Analysis</h3></b>
-In this section we will create scripts to execute each step. The scripts will be located in metagenomics/scripts directory.
+In this section we will create scripts to execute on each step. The steps will be run form <code>~/workspace/metagenomics</code> while scripts will be located in <code>~/workspace/metagenomics/scripts</code> directory.
 <pre><code>cd ~/workspace/metagenomics</code></code></pre>
 (<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics</code>)<br><br>
 We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
