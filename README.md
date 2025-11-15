@@ -94,7 +94,7 @@ ll *</code></pre>
 </ol>
 
 <b><h3>Analysis</h3></b>
-In this section we will create scripts to execute on each step. The steps will be run form <code>~/workspace/metagenomics</code> while scripts will be located in <code>~/workspace/metagenomics/scripts</code> directory.
+In this section we will create scripts to execute on each step. The steps will be run form <code>\~/workspace/metagenomics</code> while scripts will be located in <code>\~/workspace/metagenomics/scripts</code> directory.
 <pre><code>cd ~/workspace/metagenomics</code></code></pre>
 (<i>if you get lost, you can use the absolute path:</i> <code>/analyses/vdworkshop/${USER}/metagenomics</code>)<br><br>
 We will use <i>nano</i> text editor to creat all scripts. You can create empty file and open it to edit at the same time
