@@ -11,7 +11,8 @@ In this tutorial we will learn how to taxonomically classify and visualize our m
 3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
 4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
 5. [NCBI BLAST](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
-6. [RSEM](https://github.com/deweylab/RSEM) and [TRINITY](https://github.com/trinityrnaseq/trinityrnaseq/wiki)
+6. [seqkit](https://bioinf.shenwei.me/seqkit/)
+7. [RSEM](https://github.com/deweylab/RSEM) and [TRINITY](https://github.com/trinityrnaseq/trinityrnaseq/wiki)
 </list>
 These programs can be installed under conda environment:
 
