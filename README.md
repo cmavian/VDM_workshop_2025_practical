@@ -327,7 +327,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 echo '[INFO] Reading database file '{$DB}
 if [[ ! -e ${input_db}/${DB}.dmnd ]]; then
   diamond makedb --in ${FASTA} --threads ${THR} -d ${input_db}/${DB}; fi
-chmod a=rwx ${input_db}/${DB}.dmnd
+chmod a=rwx ${input_db}/${DB}.dmnd 2>/dev/null
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
@@ -390,7 +390,7 @@ input_db=${workdir}'/data/database'
 ### DB variables and directories
 FASTA="${input_db}/nr.faa"
 DB='NRDB'
-if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gzip; fi
+if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gz; fi
 
 ### make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
@@ -399,7 +399,7 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 echo '[INFO] Reading database file '{$DB}
 if [[ ! -e ${input_db}/${DB}.dmnd ]]; then
   diamond makedb --in ${FASTA} --threads ${THR} -d ${input_db}/${DB}; fi
-chmod a=rwx ${input_db}/${DB}.dmnd
+chmod a=rwx ${input_db}/${DB}.dmnd 2>/dev/null
 
 ### loop through each of the files created in megahit output directory
 ### to find final.contigs.fa files and run diamond
