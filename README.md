@@ -359,8 +359,10 @@ export -f DBLX
 ### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
+ echo '[INFO] Starting parallel mode' && sleep 1s
  ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1 ${input_db}
 else
+ echo '[INFO] Starting non-parallel mode' && sleep 1s
  for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
   DBLX ${FOLDER} ${output} ${DB} 1 ${input_db}
  done
@@ -431,8 +433,10 @@ export -f DBLX
 ### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
+ echo '[INFO] Starting parallel mode' && sleep 1s
  ls -dl ${input}/* | grep ^d | awk '{print $9}' | parallel -j ${THR} -n1 -I% "DBLX %" ${output} ${DB} 1 ${input_db}
 else
+ echo '[INFO] Starting non-parallel mode' && sleep 1s
  for FOLDER in $(ls -dl ${input}/* | grep ^d | awk '{print $9}'); do
   DBLX ${FOLDER} ${output} ${DB} 1 ${input_db}
  done
@@ -769,6 +773,8 @@ print "\nDone! Results saved to $output_dir/taxonomy_lineage.csv\n";
 ' > ${workdir}/scripts/get_taxonomy_lineage.pl
 chmod a=rwx ${workdir}/scripts/get_taxonomy_lineage.pl
 
+NOACC=`cat ${input}'/viral_contigs_nrdb.txt' | wc -l`
+echo "[INFO] Downloading taxonomy lineage for ${NOACC} accessions"
 perl ${workdir}/scripts/get_taxonomy_lineage.pl  ${input}'/viral_contigs_nrdb.txt' ${output}
 
 chmod -R a=rwx ${output}
@@ -814,7 +820,7 @@ function RUN_RSEM {
     return
   fi
 
-  echo "[INFO] Running RSEM for ${sample}"
+  echo "[INFO] Running RSEM for ${sample}" && sleep 1s
 
   ### Run RSEM using Trinity utility
   align_and_estimate_abundance.pl \
@@ -837,8 +843,10 @@ echo "[INFO] Starting RSEM quantification for samples..."
 ### check and run in parallel
 PARALLEL_VER=(`parallel --version | grep 'GNU parallel'`)
 if [[ ${PARALLEL_VER[2]} =~ [0-9]+ ]]; then
+ echo '[INFO] Starting non-parallel mode' && sleep 1s
  ls -dl ${reads}/*.gz | awk '{print $9}' | grep -Ei '_r?1' | parallel -j ${THR} -n1 -I% "RUN_RSEM %" ${reads} ${assemblies} ${output} 1
 else
+ echo '[INFO] Starting parallel mode' && sleep 1s
  for FILE in $(ls -dl ${reads}/*.gz | awk '{print $9}' | grep -Ei '_r?1'); do
   RUN_RSEM ${FILE} ${reads} ${assemblies} ${output} 1
  done
