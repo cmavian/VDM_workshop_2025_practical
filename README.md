@@ -18,7 +18,7 @@ These programs can be installed under conda environment:
 
 1. Install [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install)
 2. Create conda environment:
-   <pre><code>conda create -n viral_discovery -c bioconda -c conda-forge python=3.12 rsem trinityrnaseq samtools=1.21 bowtie2 trimmomatic fastqc megahit diamond blast seqkit</code></pre>
+   <pre><code>conda create -n viral_discovery -c bioconda -c conda-forge python=3.12 rsem trinity samtools=1.21 bowtie2 trimmomatic fastqc megahit diamond blast seqkit</code></pre>
 4. activate the environment in the scripts:
    <pre><code>ON='conda activate viral_discovery' && eval ${ON}</code></pre>
 
