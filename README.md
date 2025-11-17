@@ -447,7 +447,9 @@ fi
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/06.2.diamond_nrdb.sh</code></pre>
-<pre><code>bash scripts/06.2.diamond_nrdb.sh</code></pre>
+<pre><code>#bash scripts/06.2.diamond_nrdb.sh</code></pre>
+<i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
+<pre><code>cp -R ../../backup/results/06.2.diamond_nrdb ./results/</code></pre>
 </ol>
 
 <li>Combining results from both blastx searches</li><br>
@@ -569,11 +571,12 @@ Log               : ${output}/blastn.log
 "
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/08.ncbi_ntdb.sh</code></pre>
-
-<pre><code>bash scripts/08.ncbi_ntdb.sh</code></pre>
+<pre><code>#bash scripts/08.ncbi_ntdb.sh</code></pre>
+<i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
+<pre><code>cp -R ../../backup/results/08.ncbi_ntdb ./results/</code></pre>
 
 <li>Combining and filtering sequences from NCBI nucleotide database</li><br>
-<pre><code>nano scripts/09.blastn_filtered</code></pre>
+<pre><code>nano scripts/09.blastn_filtered.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -619,8 +622,8 @@ Viral contigs FASTA: ${viral_fasta}
 Output directory   : ${output}
 "
 exit 0;</code></pre>
-<pre><code>chmod a=rwx scripts/09.blastn_filtered</code></pre>
-<pre><code>bash scripts/09.blastn_filtered</code></pre>
+<pre><code>chmod a=rwx scripts/09.blastn_filtered.sh</code></pre>
+<pre><code>bash scripts/09.blastn_filtered.sh</code></pre>
 
 <li>Combining and filtering sequences from NCBI nucleotide database</li><br>
 
