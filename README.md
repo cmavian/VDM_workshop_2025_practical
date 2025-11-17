@@ -34,7 +34,7 @@ On Windows computers, you have to emulate a terminal.
 Multiple free programs provide that function, e.g [MobaXterm](https://mobaxterm.mobatek.net/), [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html), [GitBash](https://git-scm.com/downloads), [Terminus](https://termius.com/) etc.
 Using one of the emulators, open a terminal and connect to host by typing:
 
-<pre><code><h3>ssh username@ceri.samrc.ac.za</h3>h3></code></pre>
+<pre><code><h3>ssh username@ceri.samrc.ac.za</h3></code></pre>
 
 List of usernames and passwords is avalable under [USERNAME LIST](https://docs.google.com/spreadsheets/d/1n9_X7WztBnIPJ1bgNOBT3rxLMiI8FbEFKeIVxaJ-FOM/edit?usp=drive_link). The passwords are only valid for <b>next 7 days</b>.<br>
 First time connecting you will be ask if you trust the connection. 
