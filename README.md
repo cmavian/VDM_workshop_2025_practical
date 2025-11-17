@@ -536,7 +536,7 @@ output=${workdir}'/results/08.ncbi_ntdb'
 input_db=${workdir}'/data/database'
 
 ### DB variables and directories
-DB='nt'
+DB='ntdb'
 if [[ ! -e ${input_db}/${DB}/${DB}.nal ]]; then
   echo '[INFO] Indexing nucleotide NCBI database'
   makeblastdb -out ${input_db}/${DB}/${DB} -dbtyp 'nucl' -parse_seqids -n ${input_db}/${DB}/${DB}.fasta -input_type 'fasta'; fi
