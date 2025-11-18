@@ -351,6 +351,7 @@ function DBLX {
     --id 80 \
     --strand both \
     --unal 0 \
+	--more-sensitive \
     --mp-init 1>${LOG} 2>${LOG}
   else
     echo "[WARNING] Contigs file for ${ID} not found."
@@ -427,6 +428,7 @@ function DBLX {
     --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
     --id 80 \
     --strand both \
+	--more-sensitive \
     --unal 0 \
     --mp-init 1>${LOG} 2>${LOG}
   else
@@ -671,6 +673,7 @@ diamond blastx \
     --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
     --id 80 \
     --strand both \
+	--more-sensitive \
     --unal 0 \
     2> ${output}'/diamond.log'
 
