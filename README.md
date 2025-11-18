@@ -302,7 +302,7 @@ exit 0;</code></pre>
 
 <h4><li>Diamond</li></h4>
 <ol start=i>
-<h4><li>Filtering viral sequences from RVDB protein database</li></h4></ol>
+<h4><li>Filtering viral sequences from RVDB protein database</li></h4>
 <pre><code>nano scripts/06.1.diamond_rvdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -375,7 +375,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/06.1.diamond_rvdb.sh</code></pre>
 <pre><code>bash scripts/06.1.diamond_rvdb.sh</code></pre>
 
-<h4><li>Filtering viral sequences from NCBI protein database</li></h4><br>
+<h4><li>Filtering viral sequences from NCBI protein database</li></h4>
 <pre><code>nano scripts/06.2.diamond_nrdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -450,10 +450,10 @@ exit 0;</code></pre>
 <pre><code>#bash scripts/06.2.diamond_nrdb.sh</code></pre>
 <i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
 <pre><code>cp -R ../../backup/results/06.2.diamond_nrdb ./results/</code></pre>
-</ol>
+</ol> </ol>
 
-<h4><li>Combining results from both blastx searches</li></h4><br>
-
+<ol start=7>
+<h4><li>Combining results from both blastx searches</li></h4>
 <pre><code>nano scripts/07.combine.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -521,7 +521,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/07.combine.sh</code></pre>
 <pre><code>bash scripts/07.combine.sh</code></pre>
 
-<h4><li>Filtering viral sequences from NCBI nucleotide database</li></h4><br>
+<h4><li>Filtering viral sequences from NCBI nucleotide database</li></h4>
 <pre><code>nano scripts/08.ncbi_ntdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -685,7 +685,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 <pre><code>bash scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 
-<h4><li>Fetching taxonomy linage from NCBI nucleotide database</li></h4><br>
+<h4><li>Fetching taxonomy linage from NCBI nucleotide database</li></h4>
 
 <pre><code>nano scripts/11.genbank_fetch.sh</code></pre>
 
@@ -788,7 +788,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/11.genbank_fetch.sh</code></pre>
 <pre><code>bash scripts/11.genbank_fetch.sh</code></pre>
 
-<h4><li>Align and estimate abundance with RSEM</li></h4><br>
+<h4><li>Align and estimate abundance with RSEM</li></h4>
 <pre><code>nano scripts/12.rsem.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -863,3 +863,4 @@ chmod -R a=rwx ${output}
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/12.rsem.sh</code></pre>
 <pre><code>bash scripts/12.rsem.sh</code></pre>
+</ol>
