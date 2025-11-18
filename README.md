@@ -632,7 +632,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/09.blastn_filtered.sh</code></pre>
 <pre><code>bash scripts/09.blastn_filtered.sh</code></pre>
 
-<h4><li>Combining and filtering sequences from NCBI nucleotide database</li></h4><br>
+<h4><li>Combining and filtering sequences from NCBI non-redundant database</li></h4><br>
 
 <pre><code>nano scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 <pre><code>#!/bin/env bash
