@@ -302,7 +302,7 @@ exit 0;</code></pre>
 
 <h4><li>Diamond</li></h4>
 <ol start=i>
-<li>Filtering viral sequences from RVDB protein database</li>
+<h4><li>Filtering viral sequences from RVDB protein database</li></h4></ol>
 <pre><code>nano scripts/06.1.diamond_rvdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -375,7 +375,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/06.1.diamond_rvdb.sh</code></pre>
 <pre><code>bash scripts/06.1.diamond_rvdb.sh</code></pre>
 
-<li>Filtering viral sequences from NCBI protein database</li><br>
+<h4><li>Filtering viral sequences from NCBI protein database</li></h4><br>
 <pre><code>nano scripts/06.2.diamond_nrdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -452,7 +452,7 @@ exit 0;</code></pre>
 <pre><code>cp -R ../../backup/results/06.2.diamond_nrdb ./results/</code></pre>
 </ol>
 
-<li>Combining results from both blastx searches</li><br>
+<h4><li>Combining results from both blastx searches</li></h4><br>
 
 <pre><code>nano scripts/07.combine.sh</code></pre>
 
@@ -521,7 +521,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/07.combine.sh</code></pre>
 <pre><code>bash scripts/07.combine.sh</code></pre>
 
-<li>Filtering viral sequences from NCBI nucleotide database</li><br>
+<h4><li>Filtering viral sequences from NCBI nucleotide database</li></h4><br>
 <pre><code>nano scripts/08.ncbi_ntdb.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -575,7 +575,7 @@ exit 0;</code></pre>
 <i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
 <pre><code>cp -R ../../backup/results/08.ncbi_ntdb ./results/</code></pre>
 
-<li>Combining and filtering sequences from NCBI nucleotide database</li><br>
+<h4><li>Combining and filtering sequences from NCBI nucleotide database</li></h4><br>
 <pre><code>nano scripts/09.blastn_filtered.sh</code></pre>
 
 <pre><code>#!/bin/env bash
@@ -625,7 +625,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/09.blastn_filtered.sh</code></pre>
 <pre><code>bash scripts/09.blastn_filtered.sh</code></pre>
 
-<li>Combining and filtering sequences from NCBI nucleotide database</li><br>
+<h4><li>Combining and filtering sequences from NCBI nucleotide database</li></h4><br>
 
 <pre><code>nano scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 <pre><code>#!/bin/env bash
@@ -685,7 +685,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 <pre><code>bash scripts/10.diamond_blastx_blastn_contigs.sh</code></pre>
 
-<li>Fetching taxonomy linage from NCBI nucleotide database</li><br>
+<h4><li>Fetching taxonomy linage from NCBI nucleotide database</li></h4><br>
 
 <pre><code>nano scripts/11.genbank_fetch.sh</code></pre>
 
@@ -788,7 +788,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/11.genbank_fetch.sh</code></pre>
 <pre><code>bash scripts/11.genbank_fetch.sh</code></pre>
 
-<li>Align and estimate abundance with RSEM</li><br>
+<h4><li>Align and estimate abundance with RSEM</li></h4><br>
 <pre><code>nano scripts/12.rsem.sh</code></pre>
 
 <pre><code>#!/bin/env bash
