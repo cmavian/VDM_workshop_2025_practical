@@ -546,7 +546,9 @@ input_db=${workdir}'/data/database'
 DB='ntdb'
 if [[ ! -e ${input_db}/${DB}/${DB}.nal ]]; then
   echo '[INFO] Indexing nucleotide NCBI database'
-  makeblastdb -out ${input_db}/${DB}/${DB} -dbtyp 'nucl' -parse_seqids -n ${input_db}/${DB}/${DB}.fasta -input_type 'fasta'; fi
+  makeblastdb -out ${input_db}/${DB}/${DB} -dbtyp 'nucl' -parse_seqids \
+	-in ${input_db}/${DB}/${DB}.fasta -input_type 'fasta';
+fi
 
 ###make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
