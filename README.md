@@ -378,7 +378,7 @@ exit 0;</code></pre>
 <pre><code>cp -R /analyses/vdworkshop/backup/results/06.1.diamond_rvdb ./results/</code></pre>
 
 <h4><li>Filtering viral sequences from NCBI protein database</li></h4>
-<pre><code>nano scripts/06.2.diamond_nrdb.sh</code></pre>
+<pre><code>nano scripts/06.2.diamond_nrvir.sh</code></pre>
 
 <pre><code>#!/bin/env bash
 
@@ -390,12 +390,13 @@ eval $ON
 ### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/05.megahit'
-output=${workdir}'/results/06.2.diamond_nrdb'
+output=${workdir}'/results/06.2.diamond_nrvir'
 input_db=${workdir}'/data/database'
 
 ### DB variables and directories
 FASTA="${input_db}/nr.faa"
-DB='NRDB'
+### downsized NR database to only viral sequences
+DB='nrvir'
 if [[ ! -e ${FASTA} && -e ${FASTA}.gz ]]; then gzip -dkf ${FASTA}.gz; fi
 
 ### make output directory if it doesn't exist
@@ -448,10 +449,10 @@ fi
 
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
-<pre><code>chmod a=rwx scripts/06.2.diamond_nrdb.sh</code></pre>
-<pre><code>#bash scripts/06.2.diamond_nrdb.sh</code></pre>
+<pre><code>chmod a=rwx scripts/06.2.diamond_nrvir.sh</code></pre>
+<pre><code>#bash scripts/06.2.diamond_nrvir.sh</code></pre>
 <i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
-<pre><code>cp -R /analyses/vdworkshop/backup/results/06.2.diamond_nrdb ./results/</code></pre>
+<pre><code>cp -R /analyses/vdworkshop/backup/results/06.2.diamond_nrvir ./results/</code></pre>
 </ol> </ol>
 
 <ol start=7>
@@ -466,7 +467,7 @@ workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/05.megahit'
 output=${workdir}'/results/07.combine'
 rvdb_in=${workdir}'/results/06.1.diamond_rvdb'
-nrdb_in=${workdir}'/results/06.2.diamond_nrdb'
+nrdb_in=${workdir}'/results/06.2.diamond_nrvir'
 contigs_in=${workdir}'/results/05.megahit'
 
 combined_dir="${workdir}/results/07.combined"
