@@ -7,18 +7,19 @@
 In this tutorial we will learn how to taxonomically classify and visualize our metagenomic reads obtained with Illumina using the following programs:
 <list>
 1. [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
-2. [Trimmomatic](https://github.com/usadellab/Trimmomatic)
-3. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
-4. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
-5. [NCBI BLAST](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
-6. [seqkit](https://bioinf.shenwei.me/seqkit/)
-7. [RSEM](https://github.com/deweylab/RSEM) and [TRINITY](https://github.com/trinityrnaseq/trinityrnaseq/wiki)
+2. [MultiQC](https://seqera.io/multiqc/)
+3. [Trimmomatic](https://github.com/usadellab/Trimmomatic)
+4. [MEGAHIT](https://www.metagenomics.wiki/tools/assembly/megahit)
+5. [Diamond](https://github.com/bbuchfink/diamond?tab=readme-ov-file)
+6. [NCBI BLAST](https://www.ncbi.nlm.nih.gov/books/NBK569861/)
+7. [seqkit](https://bioinf.shenwei.me/seqkit/)
+8. [RSEM](https://github.com/deweylab/RSEM) and [TRINITY](https://github.com/trinityrnaseq/trinityrnaseq/wiki)
 </list>
 These programs can be installed under conda environment:
 
 1. Install [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install)
 2. Create conda environment:
-   <pre><code>conda create -n viral_discovery -c bioconda -c conda-forge python=3.12 rsem trinity samtools=1.21 bowtie2 trimmomatic fastqc megahit diamond blast seqkit</code></pre>
+   <pre><code>conda create -n viral_discovery -c bioconda -c conda-forge python=3.12 rsem trinity multiqc samtools=1.21 bowtie2 trimmomatic fastqc megahit diamond blast seqkit</code></pre>
 4. activate the environment in the scripts:
    <pre><code>ON='conda activate viral_discovery' && eval ${ON}</code></pre>
 
@@ -282,7 +283,7 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   ### after megahit run, prepend sample name to contigs
   ### (allows easier tracking of which contigs came from which sample in downstream analysis)
   awk -v prefix="${ID}_" '/^>/ {$0=">" prefix substr($0,2)} {print}
-    ' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
+    ' ${output}/${ID}/final.contigs.fa | tr ' ' '_' > ${output}/${ID}/${ID}.contigs.fasta
 
   echo '[INFO] Cleaning results' && sleep 1s
   rm -Rf ${output}/${ID}/intermediate_contigs 2>/dev/null
@@ -484,7 +485,7 @@ combined_contigs=${combined_dir}'/all_contigs.fasta'
 viral_fasta=${combined_dir}'/viral_contigs.fasta'
 
 echo "[INFO] Concatenating all contigs..."
-cat ${contigs_in}/*.contigs.fasta > ${combined_contigs}
+cat ${contigs_in}/*.contigs.fasta | tr ' ' '_' > ${combined_contigs}
 
 echo "[INFO] Concatenating RVDB blastx results..."
 cat ${rvdb_in}/*_rvdb.blastx > ${rvdb_out}
