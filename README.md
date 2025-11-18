@@ -373,7 +373,9 @@ fi
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/06.1.diamond_rvdb.sh</code></pre>
-<pre><code>bash scripts/06.1.diamond_rvdb.sh</code></pre>
+<pre><code>#bash scripts/06.1.diamond_rvdb.sh</code></pre>
+<i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
+<pre><code>cp -R /analyses/vdworkshop/backup/results/06.1.diamond_rvdb ./results/</code></pre>
 
 <h4><li>Filtering viral sequences from NCBI protein database</li></h4>
 <pre><code>nano scripts/06.2.diamond_nrdb.sh</code></pre>
@@ -449,7 +451,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/06.2.diamond_nrdb.sh</code></pre>
 <pre><code>#bash scripts/06.2.diamond_nrdb.sh</code></pre>
 <i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
-<pre><code>cp -R ../../backup/results/06.2.diamond_nrdb ./results/</code></pre>
+<pre><code>cp -R /analyses/vdworkshop/backup/results/06.2.diamond_nrdb ./results/</code></pre>
 </ol> </ol>
 
 <ol start=7>
@@ -573,7 +575,7 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/08.ncbi_ntdb.sh</code></pre>
 <pre><code>#bash scripts/08.ncbi_ntdb.sh</code></pre>
 <i>Running this step will take few to several hours. Therefore, to save time we will copy the results of this step from backup location</i>
-<pre><code>cp -R ../../backup/results/08.ncbi_ntdb ./results/</code></pre>
+<pre><code>cp -R /analyses/vdworkshop/backup/results/08.ncbi_ntdb ./results/</code></pre>
 
 <h4><li>Combining and filtering sequences from NCBI nucleotide database</li></h4><br>
 <pre><code>nano scripts/09.blastn_filtered.sh</code></pre>
