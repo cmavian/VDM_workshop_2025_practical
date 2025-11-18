@@ -467,7 +467,6 @@ THR=5
 ### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/05.megahit'
-output=${workdir}'/results/07.combine'
 rvdb_in=${workdir}'/results/06.1.diamond_rvdb'
 nrdb_in=${workdir}'/results/06.2.diamond_nrvir'
 contigs_in=${workdir}'/results/05.megahit'
