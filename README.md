@@ -419,7 +419,7 @@ function DBLX {
 
   if [[ -f ${CONTIGS} ]]; then
 	echo "[INFO] Analyzing sample ${ID}"
-    sample_out=${OUT}/${ID}_nrdb.blastx
+    sample_out=${OUT}/${ID}_nrvir.blastx
     diamond blastx -d ${DBDIR}/${DB}.dmnd \
     -q ${CONTIGS} \
     --out ${sample_out} \
@@ -491,7 +491,7 @@ echo "[INFO] Concatenating RVDB blastx results..."
 cat ${rvdb_in}/*_rvdb.blastx > ${rvdb_out}
 
 echo "[INFO] Concatenating VP blastx results..."
-cat ${nrdb_in}/*_nrdb.blastx > ${nrdb_out}
+cat ${nrdb_in}/*_nrvir.blastx > ${nrdb_out}
 
 echo "[INFO] Filtering for viral hits..."
 grep -Ei "vir[us|idae|oid]" ${rvdb_out} > ${rvdb_virus}
