@@ -284,7 +284,7 @@ for FOW in $(ls ${input}/*_1.P.fq.gz); do
   awk -v prefix="${ID}_" '/^>/ {$0=">" prefix substr($0,2)} {print}
     ' ${output}/${ID}/final.contigs.fa > ${output}/${ID}/${ID}.contigs.fasta
 
-  echo '[INFO] Cleaning results]' && sleep 1s
+  echo '[INFO] Cleaning results' && sleep 1s
   rm -Rf ${output}/${ID}/intermediate_contigs 2>/dev/null
   ln -s  ${output}/${ID}/${ID}.contigs.fasta  ${output}/${ID}.contigs.fasta
   echo "[DONE] Megahit assmebly completed successfully and contigs named with sample name: ${ID}" && sleep 1s
