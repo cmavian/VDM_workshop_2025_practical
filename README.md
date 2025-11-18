@@ -477,7 +477,7 @@ combined_dir="${workdir}/results/07.combined"
 if ! [[ -d ${combined_dir} ]]; then mkdir -p -m a=rwx ${combined_dir}; fi
 
 rvdb_out=${combined_dir}'/combined_rvdb.blastx'
-nrdb_out=${combined_dir}'/combined_nr.blastx'
+nrdb_out=${combined_dir}'/combined_nrdb.blastx'
 rvdb_virus=${combined_dir}'/combined_rvdb.virus_hits.blastx'
 nrdb_virus=${combined_dir}'/combined_nrdb.virus_hits.blastx'
 unique=${combined_dir}'/unique_viral_contigs.txt'
