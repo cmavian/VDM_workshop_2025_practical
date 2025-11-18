@@ -588,7 +588,7 @@ exit 0;</code></pre>
 THR=5
 ### input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
-blast_in=${workdir}'/results/08.ncbi_ntdb'
+blastn_in=${workdir}'/results/08.ncbi_ntdb'
 output=${workdir}'/results/09.blastn_filtered'
 combined_contigs=${workdir}'/results/07.combined/all_contigs.fasta'
 
