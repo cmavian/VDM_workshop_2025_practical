@@ -904,6 +904,14 @@ do
 		###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
 		awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
 		grep -A1 -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta | sed 's/--//' > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
+
+ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
+eval "${ON}"
+
+seqkit grep -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta > 	  	${output}/${ID}_SUMMARY_sorted_filtered.fasta
+	OFF='conda deactivate'
+	eval ${OFF}
+
 done
 </code></pre>
 
