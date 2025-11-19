@@ -778,6 +778,7 @@ while (my $acc = <$in>) {
 
     ### Save to CSV
     $csv->print($out, [$acc, $scientific_name, $taxid, $lineage]);
+	sleep 1;
 }
 
 close $in and close $out;
