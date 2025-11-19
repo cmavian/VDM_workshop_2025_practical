@@ -887,8 +887,6 @@ blastx=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 ###Obtain set of contigs identified by step 10
 awk '{print $1}' ${blastx}/viral_contigs_nrdb.blastx | sort -u > viral_contigs.txt
 
-contigsblastx=viral_contigs_nrdb.blastx		## !!!! add name of the individual contigs file generated after step 10 (after filtering)
-
 ###Library IDs to iterate through
 IDs=(SRR31521267 SRR13765816 SRR848112)
 
@@ -900,27 +898,27 @@ for ID in IDs
 do
         ###Sort the result table by abundance and size of contig
         sort -k4rh -k2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
-        ###Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
+		###Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
         grep -v 'phage' ${input}/${ID}_SUMMARY_sorted > ${output}/${ID}_SUMMARY_sorted_filtered.txt
-        ###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
+		###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
 		awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
-		grep -A1 -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_${contigsblastx}.fasta | sed 's/--//' > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
+		grep -A1 -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta | sed 's/--//' > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
 done
 </code></pre>
 
 The following are bash commands used to investigate the results and determine for each result whether it represents a real virus, a true positive, or not.
 
 Reminder:
-    SRR848112 is a fecal sample
-    SRR13765816 is a lip sample
+    SRR848112 is a fecal sample, 
+    SRR13765816 is a lip sample, and
     SRR31521267 is a negative
 <pre><code>## Check how many viral hits per library
-wc -l ${input}SRR*</code></pre>
+wc -l ${input}/SRR*</code></pre>
 
 Lets start by running the previous script. This will make some new result files that collect all of the information and contigs we identified in previous steps, as well as sort the results by the length of the contigs and abundance values (from step 12 using rsem). 
 
 <pre><code>###SORT RESULTS
-bash scripts/13.filter-sort.sh</code></pre>code>
+bash scripts/13.filter-sort.sh</code></pre>
 	
 We now have sorted tables to investigate the results of our pipeline. We will use the 'less' command to parse our results, the aim being to 
 get a general idea of what is in there
@@ -934,7 +932,7 @@ ID=SRR31521267 	## choose different SRR IDs to explore with the 'less' command
 less ${input}/${ID}_SUMMARY_sorted_filtered.txt ## start with SRR31521267 - negative control - what's in there?
 #(Scroll with arrow keys; type q to exit less command)</code></pre>
 
-One hit in SRR31521267 - the negative control - is to a human papillomavirus. Human viruses are common human contaminants in virus discovery, and the presence of this hit in the negative control lets us know that hits for these viruses in the other samples can be discarded.
+One hit in SRR31521267 - the negative control - is to a human papillomavirus. Human viruses are common contaminants in virus discovery, and the presence of this hit in the negative control lets us know that hits for these viruses in the other samples can be discarded.
 
 Let's check if we can see the papilloma in other libraries?
 
@@ -945,36 +943,35 @@ grep -i "papilloma" ${input}/SRR31521267_summary.txt
 #how similar is it to the blast hit? is it likely a virus that makes sense in a Tasmanian devil library? </code></pre>
 
 
-
-### Proceed by examining contigs with webtools
-## use cat, less or grep to view contigs and copy and paste them into webtools
+Proceed by examining the contigs - use cat, less or grep to view contigs and copy and paste them into webtools. The following code shows how to extract a contig you are interested in.
+<pre><code>
 cat ${input}/${ID}_SUMMARY_sorted_filtered.fasta
 ## grep a specific contig that you liked from the results summary table
 contig="" 	## add contig name
-grep -A1 ${contig} ${output}/${ID}_SUMMARY_sorted_filtered.fasta
+grep -A1 ${contig} ${output}/${ID}_SUMMARY_sorted_filtered.fasta</code></pre>
 
-## Find ORFS
+Once you have extracted a contig of interest, lets find ORFS.
 Expasy translate: https://web.expasy.org/translate/
 - Check for interupted stop codons
 - Download translated frames to get protein sequences
+If the contig does not have complete ORFs, choose another contig to look at.
 
-## Annotate genome and determine what proteins are encoded
+Next, if the ORFs look real for a contig, annotate the contig and determine what proteins are encoded
 CDD search: https://www.ncbi.nlm.nih.gov/Structure/cdd/wrpsb.cgi
 - Note that if long contigs don't have any viral domains, it may be a false positive.
 
 ## Additional:
-## If you find segmented viruses, try to find all the segments eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
-#Use ICTV as a guide to determine number of expected segments
+If you find segmented viruses, try to find all the segments eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
+Use ICTV as a guide to determine number of expected segments
 https://ictv.global/report/genome
 
-## search blast results for all contigs from relevant species, genus or family if relevant
-#eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
-# Crimean-Congo hemorrhagic fever virus species name
+Search blast results for all contigs from relevant species, genus or family if relevant
+eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
+<pre><code># Crimean-Congo hemorrhagic fever virus species name
 grep "Orthonairovirus haemorrhagiae" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
 # Crimean-Congo hemorrhagic fever virus genus name
 grep "Orthonairovirus" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
 # Crimean-Congo hemorrhagic fever virus family name
 grep "Nairoviridae" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
-
 </code></pre>
 </ol>
