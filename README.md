@@ -645,7 +645,7 @@ eval $ON
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
 output=${workdir}'/results/10.diamond_blastx_blastn_contigs'
-assembly=${workdir}'/05.megahit'
+assembly=${workdir}'/results/05.megahit'
 input_db=${workdir}'/data/database'
 unique=${output}'/unique_viral_contigs.txt'
 
@@ -689,7 +689,7 @@ cat ${output}/viral_contigs_nrdb.blastx | grep -Ei "vir[us|idae|oid]" | awk '{pr
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval ${ON}
 
-for FASTA in $(ls ${assembly}/*.contig.fasta); do
+for FASTA in $(ls ${assembly}/*.contigs.fasta); do
   SAMPLE=`basename -s .contigs.fasta ${FASTA}`
   echo "[INFO] Extracting viral contigs using seqkit..."
   seqkit grep -f ${unique} ${FASTA} > ${output}/${SAMPLE}_viral_contigs.fasta
