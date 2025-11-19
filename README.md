@@ -910,38 +910,45 @@ done
 
 The following are bash commands used to investigate the results and determine for each result whether it represents a real virus, a true positive, or not.
 
-<pre><code>### REVIEW RESULTS
+Reminder:
+    SRR848112 is a fecal sample
+    SRR13765816 is a lip sample
+    SRR31521267 is a negative
+<pre><code>## Check how many viral hits per library
+wc -l ${input}SRR*</code></pre>
 
-#SRR848112 is a fecal sample
-#SRR13765816 is a lip sample
-#SRR31521267 is a negative
+Lets start by running the previous script. This will make some new result files that collect all of the information and contigs we identified in previous steps, as well as sort the results by the length of the contigs and abundance values (from step 12 using rsem). 
 
-### Explore final output files
-##variable for input dir
-input=${workdir}'/results/FINAL
+<pre><code>###SORT RESULTS
+bash scripts/13.filter-sort.sh</code></pre>code>
+	
+We now have sorted tables to investigate the results of our pipeline. We will use the 'less' command to parse our results, the aim being to 
+get a general idea of what is in there
+
+<pre><code>##variable for input dir
+input=${workdir}'/results/13.filter_sort
 ID=SRR31521267 	## choose different SRR IDs to explore with the 'less' command
 #ID=SRR13765816
 #ID=SRR848112
 
-less ${input}/${ID}_SUMMARY ## start with SRR31521267 - negative control - what's in there?
-#(Scroll with arrow keys; type q to exit less command)
+less ${input}/${ID}_SUMMARY_sorted_filtered.txt ## start with SRR31521267 - negative control - what's in there?
+#(Scroll with arrow keys; type q to exit less command)</code></pre>
 
-## check if potential contaminant identified in negative control is also in other libraries
-grep -i "papilloma" ${input}/SRR31521267_SUMMARY
-## consider whether this result would be real
-## how similar is it to the blast hit? is it likely a virus that makes sense in a Tasmanian devil library?
+One hit in SRR31521267 - the negative control - is to a human papillomavirus. Human viruses are common human contaminants in virus discovery, and the presence of this hit in the negative control lets us know that hits for these viruses in the other samples can be discarded.
 
-## Check how many viral hits per library
-wc -l ${input}SRR*
+Let's check if we can see the papilloma in other libraries?
 
-### SORT RESULTS
-bash scripts/13.filter-sort.sh 
+<pre><code>
+#check if potential contaminant identified in negative control is also in other libraries
+grep -i "papilloma" ${input}/SRR31521267_summary.txt
+#consider whether this result would be real
+#how similar is it to the blast hit? is it likely a virus that makes sense in a Tasmanian devil library? </code></pre>
 
-### Proceed manually !!!!! find ideal test contigs to demonstrate each step if time
-output=${workdir}'/results/FINAL2 !!!!! edit
-ID=
+
+
+### Proceed by examining contigs with webtools
 ## use cat, less or grep to view contigs and copy and paste them into webtools
-cat ${output}/${ID}_SUMMARY_sorted_filtered.fasta
+cat ${input}/${ID}_SUMMARY_sorted_filtered.fasta
 ## grep a specific contig that you liked from the results summary table
 contig="" 	## add contig name
 grep -A1 ${contig} ${output}/${ID}_SUMMARY_sorted_filtered.fasta
