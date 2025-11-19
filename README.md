@@ -888,13 +888,13 @@ exit 0;</code></pre>
 <pre><code>bash scripts/12.rsem.sh</code></pre>
 
 <h4><li>Formatting and investigating similarity search results</li></h4>
-<pre><code>nano scripts/14.filter-sort.sh</code></pre>
+<pre><code>nano scripts/13.filter-sort.sh</code></pre>
 <pre><code>#!/bin/env bash
 
 ###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
-input=${workdir}/results/13.rsem
-output=${workdir}/results/14.filter_sort
+input=${workdir}/results/14.combine_tables
+output=${workdir}/results/13.filter_sort
 blastx=${workdir}/results/10.diamond_blastx_blastn_contigs'
 
 ###Obtain set of contigs identified by step 10
