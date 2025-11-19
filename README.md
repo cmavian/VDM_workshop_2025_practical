@@ -544,7 +544,7 @@ input_db=${workdir}'/data/database'
 DB='ntdb'
 if [[ ! -e ${input_db}/${DB}/${DB}.nal ]]; then
   echo '[INFO] Indexing nucleotide NCBI database'
-  makeblastdb -out ${input_db}/${DB}/${DB} -dbtyp 'nucl' -parse_seqids \
+  makeblastdb -out ${input_db}/${DB}/${DB} -dbtype 'nucl' -parse_seqids \
 	-in ${input_db}/${DB}/${DB}.fasta -input_type 'fasta';
 fi
 
@@ -887,6 +887,11 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/12.rsem.sh</code></pre>
 <pre><code>bash scripts/12.rsem.sh</code></pre>
 
+
+
+
+
+
 <h4><li>Formatting and investigating similarity search results</li></h4>
 <pre><code>nano scripts/13.filter-sort.sh</code></pre>
 <pre><code>#!/bin/env bash
@@ -901,29 +906,30 @@ blastx=${workdir}/results/10.diamond_blastx_blastn_contigs'
 awk '{print $1}' ${blastx}/viral_contigs_nrdb.blastx | sort -u > viral_contigs.txt
 
 ###Library IDs to iterate through
-IDs=(SRR31521267 SRR13765816 SRR848112)
+IDs=(SRR31521267 SRR13765816 SRR8048112)
 
 ###Make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
-###Iterate through library IDs, the different sample types
-for ID in IDs
-do
-        ###Sort the result table by abundance and size of contig
-        sort -k15,15rh -k2,2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
-		###Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
-        grep -v 'phage' ${input}/${ID}_SUMMARY_sorted > ${output}/${ID}_SUMMARY_sorted_filtered.txt
-		###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
-		awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
-
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval "${ON}"
 
-seqkit grep -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta > 	  	${output}/${ID}_SUMMARY_sorted_filtered.fasta
-	OFF='conda deactivate'
-	eval ${OFF}
+###Iterate through library IDs, the different sample types
+for ID in ${IDs[@]}; do
+ ###Sort the result table by abundance and size of contig
+ sort -k15,15rh -k2,2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
+ ###Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
+ grep -v 'phage' ${input}/${ID}_SUMMARY_sorted > ${output}/${ID}_SUMMARY_sorted_filtered.txt
+ ###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
+ awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
 
+ seqkit grep -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
 done
+
+OFF='conda deactivate'
+eval ${OFF}
+
+
 </code></pre>
 
 The following are bash commands used to investigate the results and determine for each result whether it represents a real virus, a true positive, or not.
