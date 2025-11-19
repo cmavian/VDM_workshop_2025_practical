@@ -910,12 +910,11 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 for ID in IDs
 do
         ###Sort the result table by abundance and size of contig
-        sort -k4rh -k2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
+        sort -k15,15rh -k2,2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
 		###Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
         grep -v 'phage' ${input}/${ID}_SUMMARY_sorted > ${output}/${ID}_SUMMARY_sorted_filtered.txt
 		###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
 		awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
-		grep -A1 -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta | sed 's/--//' > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
 
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval "${ON}"
