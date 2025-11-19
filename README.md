@@ -602,7 +602,8 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 echo "[INFO] Filtering BLASTn outputs for viral hits..."
 
 ### Combine and filter
-cat ${blastn_in}/*.blastn | grep -Ei "vir[us|idae|oid]" > ${virus_hits_list}
+grep -iv "virus" ${blastn_in}/*.blastn | awk '{print $1}' | sort -u > ${blastn_in}/blastn_not-viral_IDs.txt
+grep -v -f ${blastn_in}/blastn_not-viral_IDs.txt ${workdir}/results/07.combined/unique_viral_contigs.txt > ${virus_hits_list}
 
 echo "[INFO] Extracting unique contig IDs..."
 awk '{print $1}' ${virus_hits_list} | sort -u > ${unique_ids}
@@ -879,9 +880,119 @@ else
 fi
 
 OFF='conda deactivate'
+
 eval ${OFF}
 chmod -R a=rwx ${output}
 exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/12.rsem.sh</code></pre>
 <pre><code>bash scripts/12.rsem.sh</code></pre>
+
+<h4><li>Formatting and investigating similarity search results</li></h4>
+<pre><code>nano scripts/13.filter-sort.sh</code></pre>
+<pre><code>#!/bin/env bash
+
+###input and output directories
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/12.rsem
+output=${workdir}'/results/13.filter_sort
+blastx=${workdir}'/results/10.diamond_blastx_blastn_contigs'
+
+###Obtain set of contigs identified by step 10
+awk '{print $1}' ${blastx}/viral_contigs_nrdb.blastx | sort -u > viral_contigs.txt
+
+###Library IDs to iterate through
+IDs=(SRR31521267 SRR13765816 SRR848112)
+
+###Make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
+
+###Iterate through library IDs, the different sample types
+for ID in IDs
+do
+        ###Sort the result table by abundance and size of contig
+        sort -k4rh -k2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
+		###Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
+        grep -v 'phage' ${input}/${ID}_SUMMARY_sorted > ${output}/${ID}_SUMMARY_sorted_filtered.txt
+		###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
+		awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
+		grep -A1 -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta | sed 's/--//' > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
+
+ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
+eval "${ON}"
+
+seqkit grep -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta > 	  	${output}/${ID}_SUMMARY_sorted_filtered.fasta
+	OFF='conda deactivate'
+	eval ${OFF}
+
+done
+</code></pre>
+
+The following are bash commands used to investigate the results and determine for each result whether it represents a real virus, a true positive, or not.
+
+Reminder:
+    SRR848112 is a fecal sample, 
+    SRR13765816 is a lip sample, and
+    SRR31521267 is a negative
+<pre><code>## Check how many viral hits per library
+wc -l ${input}/SRR*</code></pre>
+
+Lets start by running the previous script. This will make some new result files that collect all of the information and contigs we identified in previous steps, as well as sort the results by the length of the contigs and abundance values (from step 12 using rsem). 
+
+<pre><code>###SORT RESULTS
+bash scripts/13.filter-sort.sh</code></pre>
+	
+We now have sorted tables to investigate the results of our pipeline. We will use the 'less' command to parse our results, the aim being to 
+get a general idea of what is in there
+
+<pre><code>##variable for input dir
+input=${workdir}'/results/13.filter_sort
+ID=SRR31521267 	## choose different SRR IDs to explore with the 'less' command
+#ID=SRR13765816
+#ID=SRR848112
+
+less ${input}/${ID}_SUMMARY_sorted_filtered.txt ## start with SRR31521267 - negative control - what's in there?
+#(Scroll with arrow keys; type q to exit less command)</code></pre>
+
+One hit in SRR31521267 - the negative control - is to a human papillomavirus. Human viruses are common contaminants in virus discovery, and the presence of this hit in the negative control lets us know that hits for these viruses in the other samples can be discarded.
+
+Let's check if we can see the papilloma in other libraries?
+
+<pre><code>
+#check if potential contaminant identified in negative control is also in other libraries
+grep -i "papilloma" ${input}/SRR31521267_summary.txt
+#consider whether this result would be real
+#how similar is it to the blast hit? is it likely a virus that makes sense in a Tasmanian devil library? </code></pre>
+
+
+Proceed by examining the contigs - use cat, less or grep to view contigs and copy and paste them into webtools. The following code shows how to extract a contig you are interested in.
+<pre><code>
+cat ${input}/${ID}_SUMMARY_sorted_filtered.fasta
+## grep a specific contig that you liked from the results summary table
+contig="" 	## add contig name
+grep -A1 ${contig} ${output}/${ID}_SUMMARY_sorted_filtered.fasta</code></pre>
+
+Once you have extracted a contig of interest, lets find ORFS.
+Expasy translate: https://web.expasy.org/translate/
+- Check for interupted stop codons
+- Download translated frames to get protein sequences
+If the contig does not have complete ORFs, choose another contig to look at.
+
+Next, if the ORFs look real for a contig, annotate the contig and determine what proteins are encoded
+CDD search: https://www.ncbi.nlm.nih.gov/Structure/cdd/wrpsb.cgi
+- Note that if long contigs don't have any viral domains, it may be a false positive.
+
+## Additional:
+If you find segmented viruses, try to find all the segments eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
+Use ICTV as a guide to determine number of expected segments
+https://ictv.global/report/genome
+
+Search blast results for all contigs from relevant species, genus or family if relevant
+eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
+<pre><code># Crimean-Congo hemorrhagic fever virus species name
+grep "Orthonairovirus haemorrhagiae" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
+# Crimean-Congo hemorrhagic fever virus genus name
+grep "Orthonairovirus" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
+# Crimean-Congo hemorrhagic fever virus family name
+grep "Nairoviridae" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
+</code></pre>
 </ol>
