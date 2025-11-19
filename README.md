@@ -893,9 +893,9 @@ exit 0;</code></pre>
 
 ###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
-input=${workdir}'/results/13.rsem
-output=${workdir}'/results/14.filter_sort
-blastx=${workdir}'/results/10.diamond_blastx_blastn_contigs'
+input=${workdir}/results/13.rsem
+output=${workdir}/results/14.filter_sort
+blastx=${workdir}/results/10.diamond_blastx_blastn_contigs'
 
 ###Obtain set of contigs identified by step 10
 awk '{print $1}' ${blastx}/viral_contigs_nrdb.blastx | sort -u > viral_contigs.txt
