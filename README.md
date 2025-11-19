@@ -1049,32 +1049,35 @@ Lets start by running the previous script. This will make some new result files 
 We now have sorted tables to investigate the results of our pipeline. We will use the 'less' command to parse our results, the aim being to 
 get a general idea of what is in there
 
-<pre><code>##variable for input dir
+<pre><code>
+###' variable for input dir
 input=${workdir}'/results/14.filter_sort
-ID=SRR31521267 	## choose different SRR IDs to explore with the 'less' command
+ID=SRR31521267 	### choose different SRR IDs to explore with the 'less' command
 #ID=SRR13765816
-#ID=SRR848112
+#ID=SRR8048112
 
-less ${input}/${ID}_SUMMARY_sorted_filtered.txt ## start with SRR31521267 - negative control - what's in there?
-#(Scroll with arrow keys; type q to exit less command)</code></pre>
+less ${input}/${ID}_SUMMARY_sorted_filtered.txt ### start with SRR31521267 - negative control - what's in there?
+###' (Scroll with arrow keys; type q to exit less command)
+</code></pre>
 
 One hit in SRR31521267 - the negative control - is to a human papillomavirus. Human viruses are common contaminants in virus discovery, and the presence of this hit in the negative control lets us know that hits for these viruses in the other samples can be discarded.
 
 Let's check if we can see the papilloma in other libraries?
 
 <pre><code>
-#check if potential contaminant identified in negative control is also in other libraries
+###' check if potential contaminant identified in negative control is also in other libraries
 grep -i "papilloma" ${input}/SRR31521267_summary.txt
-#consider whether this result would be real
-#how similar is it to the blast hit? is it likely a virus that makes sense in a Tasmanian devil library? </code></pre>
-
+###' consider whether this result would be real
+###' how similar is it to the blast hit? is it likely a virus that makes sense in a Tasmanian devil library?
+</code></pre>
 
 Proceed by examining the contigs - use cat, less or grep to view contigs and copy and paste them into webtools. The following code shows how to extract a contig you are interested in.
 <pre><code>
 cat ${input}/${ID}_SUMMARY_sorted_filtered.fasta
-## grep a specific contig that you liked from the results summary table
-contig="" 	## add contig name
-grep -A1 ${contig} ${output}/${ID}_SUMMARY_sorted_filtered.fasta</code></pre>
+###' grep a specific contig that you liked from the results summary table
+contig="" 	###' add contig name
+grep -A1 ${contig} ${output}/${ID}_SUMMARY_sorted_filtered.fasta
+</code></pre>
 
 Once you have extracted a contig of interest, lets find ORFS.
 Expasy translate: https://web.expasy.org/translate/
@@ -1086,18 +1089,20 @@ Next, if the ORFs look real for a contig, annotate the contig and determine what
 CDD search: https://www.ncbi.nlm.nih.gov/Structure/cdd/wrpsb.cgi
 - Note that if long contigs don't have any viral domains, it may be a false positive.
 
-## Additional:
+###' Additional:
 If you find segmented viruses, try to find all the segments eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
 Use ICTV as a guide to determine number of expected segments
 https://ictv.global/report/genome
 
 Search blast results for all contigs from relevant species, genus or family if relevant
 eg. Crimean-Congo hemorrhagic fever virus in SRR31521267
-<pre><code># Crimean-Congo hemorrhagic fever virus species name
+
+<pre><code>
+###' Crimean-Congo hemorrhagic fever virus species name
 grep "Orthonairovirus haemorrhagiae" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
-# Crimean-Congo hemorrhagic fever virus genus name
+###' Crimean-Congo hemorrhagic fever virus genus name
 grep "Orthonairovirus" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
-# Crimean-Congo hemorrhagic fever virus family name
+###' Crimean-Congo hemorrhagic fever virus family name
 grep "Nairoviridae" ${output}/SRR31521267_SUMMARY_sorted_filtered.txt
 </code></pre>
 </ol>
