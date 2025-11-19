@@ -644,7 +644,9 @@ eval $ON
 workdir=`realpath $(pwd) 2>/dev/null`
 input=${workdir}'/results/09.blastn_filtered/viral_contigs_blastn.fasta'
 output=${workdir}'/results/10.diamond_blastx_blastn_contigs'
+assembly=${workdir}'/05.megahit'
 input_db=${workdir}'/data/database'
+unique=${output}'/unique_viral_contigs.txt'
 
 ### DB variables and directories
 FASTA="${input_db}/nr.faa"
@@ -677,7 +679,20 @@ diamond blastx \
     2> ${output}'/diamond.log'
 
 echo '[INFO] extracting accession numbers'
-cat ${output}/viral_contigs_nrdb.blastx | awk '{print $3}' > ${output}/viral_contigs_nrdb.txt
+cat ${output}/viral_contigs_nrdb.blastx | grep -Ei "vir[us|idae|oid]" | awk '{print $3}' > ${output}/viral_contigs_nrdb.txt
+
+echo "[INFO] Extracting unique contig names..."
+cat ${output}/viral_contigs_nrdb.blastx | grep -Ei "vir[us|idae|oid]" | awk '{print $1}' | sort -u > ${unique}
+
+### Activate seqkit environment
+ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
+eval ${ON}
+
+for FASTA in $(ls ${assembly}/*.contig.fasta); do
+  SAMPLE=`basename -s .contigs.fasta ${FASTA}`
+  echo "[INFO] Extracting viral contigs using seqkit..."
+  seqkit grep -f ${unique} ${FASTA} > ${output}/${SAMPLE}_viral_contigs.fasta
+done
 chmod -R a=rwx ${output}/*
 
 echo -en "
