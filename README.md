@@ -349,7 +349,6 @@ function DBLX {
     --threads ${T} \
     --evalue 1e-5 \
     --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
-    --id 80 \
     --strand both \
     --unal 0 \
 	--more-sensitive \
@@ -427,7 +426,6 @@ function DBLX {
     --threads ${T} \
     --evalue 1e-5 \
     --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
-    --id 80 \
     --strand both \
 	--more-sensitive \
     --unal 0 \
@@ -671,9 +669,8 @@ diamond blastx \
     --out ${output}'/viral_contigs_nrdb.blastx' \
     --threads ${THR} \
     --evalue 1e-5 \
-    --max-target-seqs 25 \
+    --max-target-seqs 1 \
     --outfmt 6 qseqid qlen sseqid stitle pident length evalue bitscore \
-    --id 80 \
     --strand both \
 	--more-sensitive \
     --unal 0 \
