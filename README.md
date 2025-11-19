@@ -24,7 +24,7 @@ These programs can be installed under conda environment:
    <pre><code>ON='conda activate viral_discovery' && eval ${ON}</code></pre>
 
 <figure>
-    <img src="workflowC.png" width="920" height="1200">
+    <img src="workflow.png" width="920" height="1200">
     <figcaption><b>Figure 1.</b> Virus discovery pipeline Workflow by Nokuzotha Nkiwane </figcaption>
 </figure>
 
