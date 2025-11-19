@@ -604,7 +604,8 @@ if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 echo "[INFO] Filtering BLASTn outputs for viral hits..."
 
 ### Combine and filter
-cat ${blastn_in}/*.blastn | grep -Ei "vir[us|idae|oid]" > ${virus_hits_list}
+grep -iv "virus" ${blastn_in}/*.blastn | awk '{print $1}' | sort -u > ${blastn_in}/blastn_not-viral_IDs.txt
+grep -v -f ${blastn_in}/blastn_not-viral_IDs.txt ${workdir}/results/07.combined/unique_viral_contigs.txt > ${virus_hits_list}
 
 echo "[INFO] Extracting unique contig IDs..."
 awk '{print $1}' ${virus_hits_list} | sort -u > ${unique_ids}
