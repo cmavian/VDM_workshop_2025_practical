@@ -888,13 +888,13 @@ exit 0;</code></pre>
 <pre><code>bash scripts/12.rsem.sh</code></pre>
 
 <h4><li>Formatting and investigating similarity search results</li></h4>
-<pre><code>nano scripts/13.filter-sort.sh</code></pre>
+<pre><code>nano scripts/14.filter-sort.sh</code></pre>
 <pre><code>#!/bin/env bash
 
 ###input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
-input=${workdir}'/results/12.rsem
-output=${workdir}'/results/13.filter_sort
+input=${workdir}'/results/13.rsem
+output=${workdir}'/results/14.filter_sort
 blastx=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 
 ###Obtain set of contigs identified by step 10
@@ -938,13 +938,13 @@ wc -l ${input}/SRR*</code></pre>
 Lets start by running the previous script. This will make some new result files that collect all of the information and contigs we identified in previous steps, as well as sort the results by the length of the contigs and abundance values (from step 12 using rsem). 
 
 <pre><code>###SORT RESULTS
-bash scripts/13.filter-sort.sh</code></pre>
+bash scripts/14.filter-sort.sh</code></pre>
 	
 We now have sorted tables to investigate the results of our pipeline. We will use the 'less' command to parse our results, the aim being to 
 get a general idea of what is in there
 
 <pre><code>##variable for input dir
-input=${workdir}'/results/13.filter_sort
+input=${workdir}'/results/14.filter_sort
 ID=SRR31521267 	## choose different SRR IDs to explore with the 'less' command
 #ID=SRR13765816
 #ID=SRR848112
