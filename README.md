@@ -887,68 +887,164 @@ exit 0;</code></pre>
 <pre><code>chmod a=rwx scripts/12.rsem.sh</code></pre>
 <pre><code>bash scripts/12.rsem.sh</code></pre>
 
-
-
-
-
-
-<h4><li>Formatting and investigating similarity search results</li></h4>
-<pre><code>nano scripts/13.filter-sort.sh</code></pre>
+<h4><li>Join RSEM, Blastx and lineage tables</li></h4>
+<pre><code>nano scripts/13.combine_tables.sh</code></pre>
 <pre><code>#!/bin/env bash
 
-###input and output directories
+THR=5
+ON='module R'
+eval ${ON}
+
+###' input and output directories
 workdir=`realpath $(pwd) 2>/dev/null`
-input=${workdir}'/results/14.combine_tables'
-output=${workdir}'/results/13.filter_sort'
-blastx=${workdir}'/results/10.diamond_blastx_blastn_contigs'
+input_taxa=${workdir}'/results/11.genbank_fetch/taxonomy_lineage.csv'
+input_rsem=${workdir}'/results/12.rsem'
+input_bltx=${workdir}'/results/10.diamond_blastx_blastn_contigs/viral_contigs_nrdb.blastx'
+output=${workdir}'/results/13.combine_tables'
 
-
-###Obtain set of contigs identified by step 10
-#awk '{print $1}' ${blastx}/viral_contigs_nrdb.blastx | sort -u > viral_contigs.txt
-
-
-###Library IDs to iterate through
-IDs=(SRR31521267 SRR13765816 SRR8048112)
-
-
-###Make output directory if it doesn't exist
+###' make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
+###' generating R script.
+###' You need to have or install fallowing R packages:
+###' "dplyr", "readr", "stringr", "tidyverse"
+
+echo '#!/bin/env R
+
+rm(list=ls())
+args = commandArgs(trailingOnly=TRUE)
+
+####' test if there is at least one argument: if not, return an error
+if (length(args) < 3) {
+  stop("Expected 3 tables supplied", call.=FALSE)
+}
+
+###' ---- Input files ----
+taxonomy_file <- args[1]
+blast_file    <- args[2]
+rsem_dir      <- args[3]
+
+###' Library check and activation
+library("dplyr")
+library("readr")
+library("stringr")
+library("tidyverse")
+
+###' ---- Read taxonomy table ----
+###' Assumes first column = Accession
+taxonomy <- read_csv(taxonomy_file, show_col_types = FALSE)
+colnames(taxonomy) <- c("Accession","Organism","TaxID","Lineage")
+taxonomy <- taxonomy %>% distinct(Accession, .keep_all = TRUE)
+
+###' ---- Read BLASTX table ----
+###' BLASTX files are usually tab-separated
+blast <- read_tsv(blast_file, col_names = FALSE, show_col_types = FALSE)
+colnames(blast) <- c("Contig","query.len","Accession","seq.title","pident",
+                     "length","evalue","bitscore")
+blast <- blast %>%
+  arrange(Contig,desc(pident), desc(length),desc(bitscore)) %>%
+  group_by(Contig) %>%
+  slice(1) %>%          # take the best row per Contig
+  ungroup()
+
+blast$SAMPLE<- str_extract(blast$Contig, "SRR[0-9]+")
+
+###' ---- Read RSEM table --s-
+rsem <- tibble();
+for (rsem_file in list.files(rsem_dir, pattern = ".RSEM$")) {
+ rsem <- rbind(rsem,
+               read.table(paste(rsem_dir,rsem_file,"RSEM.genes.results",sep="/"),
+			              header = TRUE,
+			              sep = "\t",
+						  stringsAsFactors = FALSE))
+}
+rsem <- rsem[-1]
+colnames(rsem) <- c("Contig","length","effective_length","expected_count","TPM","FPKM")
+rsem <- blast %>% mutate(SAMPLE = unlist(strsplit(rsem$Contig,"_"))[1] )
+rsem$SAMPLE <- str_extract(rsem$Contig, "SRR[0-9]+")
+
+###' ---- Merging table ----
+merged <- blast %>% full_join(taxonomy, by ="Accession")
+merged <- merged %>% full_join(rsem, by = c("Contig","SAMPLE"))
+###' ----- Renaming columns ----
+colnames(merged) <- c("Contig","query.len","Accession","seq.title","pident","aln.length","evalue","bitscore","Sample",
+                      "Organism","TaxID","Lineage","length.y","effective_length","expected_count","TPM","FPKM")
+###' ---- sorting columns ----
+merged <- merged %>%
+          select(c("Sample","Contig","query.len","Accession","seq.title","pident","aln.length","evalue","bitscore",
+                   "Organism","TaxID","Lineage","length.y","effective_length","expected_count","TPM","FPKM") )
+###' ---- Output one file per SRR ----
+unique_SRRs <- unique(merged$Sample)
+for (srr in unique_SRRs) {
+  subset_df <- merged %>% filter(Sample == srr)
+  outfile <- paste0(srr, "_summary.txt")
+  write_tsv(subset_df, outfile)
+  message("Created: ", outfile)
+}
+' > ${output}/join_tab.R
+chmod a=rwx ${output}/join_tab.R
+	  
+Rscript --vanilla ${output]/join_tab.R ${input_taxa} ${input_bltx} `realapth ${input_rsem} 2>/dell/null`
+
+echo '[INFO] Merging of tables finished'
+exit 0;</code></pre>
+<pre><code>chmod a=rwx scripts/13.combine_tables.sh</code></pre>
+<pre><code>bash scripts/13.combine_tables.sh</code></pre>
+
+<h4><li>Formatting and investigating similarity search results</li></h4>
+<pre><code>nano scripts/14.filter_sort.sh</code></pre>
+<pre><code>#!/bin/env bash
+
+###' input and output directories
+workdir=`realpath $(pwd) 2>/dev/null`
+input=${workdir}/results/13.combine_tables
+output=${workdir}/results/14.filter_sort
+blastx=${workdir}/results/10.diamond_blastx_blastn_contigs'
+
+###' Obtain set of contigs identified by step 10
+awk '{print $1}' ${blastx}/viral_contigs_nrdb.blastx | sort -u > viral_contigs.txt
+
+###' Library IDs to iterate through
+#IDs=(SRR31521267 SRR13765816 SRR8048112)
+IDs=(`ls ${input}/*.txt | cut -d '_' -f1`)
+
+###' Make output directory if it doesn't exist
+if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
 
 ON="module miniconda && conda activate seqkit 1>/dev/null 2>/dev/null"
 eval "${ON}"
 
-###Iterate through library IDs, the different sample types
-for ID in ${IDs[@]};do
+###' Iterate through library IDs, the different sample types
+for ID in ${IDs[@]}; do
+ ###' Sort the result table by abundance and size of contig
+ sort -k15,15rh -k2,2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
 
- ###Sort the result table by abundance and size of contig
- sort -k15,15rh -k2,2rh ${input}/${ID}_summary.txt > ${output}/${ID}_summary_sorted.txt
- ###Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
- ###grep -v 'phage' ${output}/${ID}_summary_sorted.txt > ${output}/${ID}_summary_sorted_filtered.txt
- ###Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
- awk '{print $2}' ${output}/${ID}_summary_sorted.txt > ${output}/${ID}_summary_sorted_filtered_ids.txt
+ ###' Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
+ grep -v 'phage' ${input}/${ID}_SUMMARY_sorted > ${output}/${ID}_SUMMARY_sorted_filtered.txt
 
- seqkit grep -f ${output}/${ID}_summary_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta > ${output}/${ID}_summary_sorted_filtered.fasta
+ ###' Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
+ awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
 
+ seqkit grep -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta \
+    > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
 done
 
 OFF='conda deactivate'
-eval ${OFF}
-</code></pre>
+eval ${OFF}</code></pre>
+<pre><code>chmod a=rwx scripts/14.filter_sort.sh</code></pre>
+<pre><code>bash scripts/14.filter_sort.sh</code></pre>
 
 The following are bash commands used to investigate the results and determine for each result whether it represents a real virus, a true positive, or not.
 
 Reminder:
-    SRR848112 is a fecal sample, 
+    SRR8048112 is a fecal sample, 
     SRR13765816 is a lip sample, and
     SRR31521267 is a negative
-<pre><code>## Check how many viral hits per library
-wc -l ${input}/SRR*</code></pre>
+
+Check how many viral hits per library
+<pre><code>wc -l ${input}/SRR*</code></pre>
 
 Lets start by running the previous script. This will make some new result files that collect all of the information and contigs we identified in previous steps, as well as sort the results by the length of the contigs and abundance values (from step 12 using rsem). 
-
-<pre><code>###SORT RESULTS
-bash scripts/14.filter-sort.sh</code></pre>
 	
 We now have sorted tables to investigate the results of our pipeline. We will use the 'less' command to parse our results, the aim being to 
 get a general idea of what is in there
