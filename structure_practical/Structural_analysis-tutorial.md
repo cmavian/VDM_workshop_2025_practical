@@ -1,7 +1,7 @@
 # Structural analysis tutorial
 Metagenomic Virus Discovery Workshop
 
-November 17th 2025, 
+November 20th 2025, 
 Stellenbosch, South Africa
 
 *Spyros Lytras*
@@ -125,7 +125,7 @@ In your `.zip` results folder downloaded in the above section you will find
 a `.a3m` fle which contains the input MSA automatically made by the ColabFold
 workflow. Open this file in a text editor, how many related sequences are there?
 
-We also have a [custom MSA file](task1_data/unknown_peptide_aln.a3m) available containing metagenomically assembled 
+We also have a [custom MSA file](maintask_data/unknown_peptide_aln.a3m) available containing metagenomically assembled 
 protein sequences related to the query sequence which are not available in the 
 public databases searched by ColabFold. 
 
