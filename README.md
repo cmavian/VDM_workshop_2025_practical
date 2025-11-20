@@ -996,14 +996,14 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 ###' input and output directories
-workdir=`realpath $(pwd) 2>/dev/null`
-input=${workdir}/results/13.combine_tables
-output=${workdir}/results/14.filter_sort
-blastx=${workdir}/results/10.diamond_blastx_blastn_contigs'
+workdir=\`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/13.combine_tables'
+output=${workdir}'/results/14.filter_sort'
+blastx=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 
 ###' Library IDs to iterate through
 #IDs=(SRR31521267 SRR13765816 SRR8048112)
-IDs=(`ls ${input}/*.txt | cut -d '_' -f1`)
+IDs=(\`ls ${input}/*.txt | cut -d '_' -f1`)
 
 ###' Make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
