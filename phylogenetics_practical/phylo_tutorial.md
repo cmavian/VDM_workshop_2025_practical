@@ -39,6 +39,24 @@ mafft --genafpair input.fst > input.einsi.fst
 mafft --globalpair input.fst > input.ginsi.fst
 
 
+#reordering based on sequence similarity
+
+mafft --reorder input.fst > input.mafft.fst
 
 
+```
+
+
+
+5. Use `scp` to download the alignment from the server to your computer
+and view the alignment in Aliview
+
+
+6. If it looks good then go ahead with using the alignment to make a phylogeny! 
+
+
+7. Check the `iqtree` manual first
+
+```
+iqtree -h
 ```
