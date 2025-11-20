@@ -996,17 +996,14 @@ exit 0;</code></pre>
 <pre><code>#!/bin/env bash
 
 ###' input and output directories
-workdir=`realpath $(pwd) 2>/dev/null`
-input=${workdir}/results/13.combine_tables
-output=${workdir}/results/14.filter_sort
-blastx=${workdir}/results/10.diamond_blastx_blastn_contigs'
-
-###' Obtain set of contigs identified by step 10
-awk '{print $1}' ${blastx}/viral_contigs_nrdb.blastx | sort -u > viral_contigs.txt
+workdir=\`realpath $(pwd) 2>/dev/null`
+input=${workdir}'/results/13.combine_tables'
+output=${workdir}'/results/14.filter_sort'
+blastx=${workdir}'/results/10.diamond_blastx_blastn_contigs'
 
 ###' Library IDs to iterate through
 #IDs=(SRR31521267 SRR13765816 SRR8048112)
-IDs=(`ls ${input}/*.txt | cut -d '_' -f1`)
+IDs=(\`ls ${input}/*.txt | cut -d '_' -f1`)
 
 ###' Make output directory if it doesn't exist
 if ! [[ -d ${output} ]]; then mkdir -p -m a=rwx ${output}; fi
@@ -1017,16 +1014,15 @@ eval "${ON}"
 ###' Iterate through library IDs, the different sample types
 for ID in ${IDs[@]}; do
  ###' Sort the result table by abundance and size of contig
- sort -k15,15rh -k2,2rh ${input}/${ID}_summary.txt > ${output}/${ID}_SUMMARY_sorted.txt
+ sort -t$'\t' -k 3rn -k 16rn ${input}/${ID}_summary.txt > ${output}/${ID}_summary_sorted.txt
 
  ###' Filter out hits to phage (these hits are commonly discarded, but if phage is relevant to your aim, skip this step)
- grep -v 'phage' ${input}/${ID}_SUMMARY_sorted > ${output}/${ID}_SUMMARY_sorted_filtered.txt
+ grep -v 'phage' ${input}/${ID}_summary_sorted > ${output}/${ID}_summary_sorted_filtered.txt
 
  ###' Get contigs for the filtered dataset (i.e. viral contigs without phage contigs)
- awk '{print $1}' ${output}/${ID}_SUMMARY_sorted_filtered.txt > ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt
-
- seqkit grep -f ${output}/${ID}_SUMMARY_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta \
-    > ${output}/${ID}_SUMMARY_sorted_filtered.fasta
+ awk '{print $1}' ${output}/${ID}_summary_sorted_filtered.txt > ${output}/${ID}_summary_sorted_filtered_ids.txt
+ seqkit grep -f ${output}/${ID}_summary_sorted_filtered_ids.txt ${blastx}/${ID}_viral_contigs.fasta \
+    > ${output}/${ID}_summary_sorted_filtered.fasta
 done
 
 OFF='conda deactivate'
