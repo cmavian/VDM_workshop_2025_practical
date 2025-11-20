@@ -896,7 +896,7 @@ ON='module R'
 eval ${ON}
 
 ###' input and output directories
-workdir=`realpath $(pwd) 2>/dev/null`
+workdir=\`realpath $(pwd) 2>/dev/null`
 input_taxa=${workdir}'/results/11.genbank_fetch/taxonomy_lineage.csv'
 input_rsem=${workdir}'/results/12.rsem'
 input_bltx=${workdir}'/results/10.diamond_blastx_blastn_contigs/viral_contigs_nrdb.blastx'
