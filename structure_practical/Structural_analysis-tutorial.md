@@ -29,6 +29,9 @@ in order to detect extremely diverse viruses hiding in metagenomic samples.
 
 
 
+## For your reference (Choosing which prediction software to use)
+![structure_table](images/prediction_table.png)
+
 ## Main task
 
 You are given a protein sequence of interest that you found in high abundance within your metagenomic sequencing dataset.
