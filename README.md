@@ -3,6 +3,12 @@
 <i>created by</i> Erin Harvey, Carla Mavian, Nokuzotha Nkiwane, TJ Sanko, Eduan Wilkinson.
 <i>(in alphabetical order)</i>
 
+<b><h3>Links to other practicals</h3></b>
+
+- [Phylogenetics Practical](phylogenetics_practical/phylo_tutorial.md)
+
+- [Structure Prediction Practical](structure_practical/Structural_analysis-tutorial.md)
+
 <b><h3>Metagenomic Workflow</h3></b>
 In this tutorial we will learn how to taxonomically classify and visualize our metagenomic reads obtained with Illumina using the following programs:
 <list>
